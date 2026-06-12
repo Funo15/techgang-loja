@@ -8,18 +8,28 @@ require('dotenv').config(); // .env primeiro — Stripe/SMTP dependem disto
 const express = require('express');
 const path = require('path');
 const config = require('./config');
+const { limitadorGeral, helmetConfig } = require('./lib/seguranca');
 
 // Inicializa a BD (cria schema + seed na primeira execução)
 require('./db/database');
 
 const app = express();
 
+// Headers de segurança (antes de tudo)
+app.use(helmetConfig);
+
+// Confiar no proxy do Railway para req.ip correto
+app.set('trust proxy', 1);
+
 // Webhook do Stripe ANTES do express.json(): a verificação da
 // assinatura precisa do raw body, não do JSON já parseado.
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), require('./routes/stripe-webhook'));
 
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 app.use(require('cookie-parser')());
+
+// Rate limiting geral na API pública (webhook é skipped automaticamente)
+app.use('/api', limitadorGeral);
 
 // Ficheiros estáticos (css, js, imagens)
 app.use(express.static(path.join(__dirname, 'public')));

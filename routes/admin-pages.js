@@ -10,6 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const config = require('../config');
 const { passwordCorreta, criarCookie, limparCookie, sessaoValida, exigirAdmin } = require('../lib/admin-auth');
+const { limitadorAuth, delayAdmin, registarFalhaAdmin, limparFalhasAdmin } = require('../lib/seguranca');
 
 const router = express.Router();
 const VIEWS = path.join(__dirname, '..', 'views');
@@ -41,13 +42,15 @@ router.get('/login', (req, res) => {
   res.send(render('login', { TITULO: `Admin | ${config.nome}` }));
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', limitadorAuth, delayAdmin, (req, res) => {
   if (!process.env.ADMIN_PASSWORD) {
     return res.status(503).json({ erro: 'ADMIN_PASSWORD não está definida no .env.' });
   }
   if (!passwordCorreta(req.body?.password)) {
+    registarFalhaAdmin(req.ip || '');
     return res.status(401).json({ erro: 'Password errada.' });
   }
+  limparFalhasAdmin(req.ip || '');
   criarCookie(res);
   res.json({ ok: true });
 });

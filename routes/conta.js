@@ -3,12 +3,13 @@
 const express = require('express');
 const db = require('../db/database');
 const auth = require('../lib/conta-auth');
+const { limitadorConta } = require('../lib/seguranca');
 
 const router = express.Router();
 
 // ---- API ----
 
-router.post('/registar', async (req, res) => {
+router.post('/registar', limitadorConta, async (req, res) => {
   const { nome, email, password } = req.body || {};
   if (!nome || !email || !password) return res.status(400).json({ erro: 'Preenche todos os campos.' });
   if (password.length < 6) return res.status(400).json({ erro: 'Password mínimo 6 caracteres.' });
@@ -19,7 +20,7 @@ router.post('/registar', async (req, res) => {
   res.json({ ok: true });
 });
 
-router.post('/entrar', async (req, res) => {
+router.post('/entrar', limitadorConta, async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) return res.status(400).json({ erro: 'Preenche todos os campos.' });
   const cliente = await auth.autenticar(email, password);
