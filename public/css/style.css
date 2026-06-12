@@ -1305,3 +1305,61 @@ body[data-page="produto"] main { padding-bottom: 90px; }
 @media (min-width: 768px) {
   .conta-area { padding: 2.5rem 1.5rem 4rem; }
 }
+
+/* ============================================================
+   BANNER DE COOKIES (RGPD)
+   ============================================================ */
+
+.cookie-banner {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
+  border-radius: 16px;
+  padding: 1.1rem 1.3rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,.22);
+  display: flex;
+  flex-direction: column;
+  gap: .9rem;
+}
+
+.cookie-banner-texto p {
+  font-size: .82rem;
+  line-height: 1.55;
+  opacity: .88;
+}
+.cookie-banner-texto a {
+  color: var(--cor-acento-claro);
+  text-decoration: underline;
+}
+
+.cookie-banner-acoes {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+
+.cookie-banner .btn-contorno {
+  border-color: rgba(255,255,255,.3);
+  color: var(--cor-fundo);
+}
+.cookie-banner .btn-contorno:hover {
+  border-color: rgba(255,255,255,.6);
+  background: rgba(255,255,255,.08);
+}
+
+@media (min-width: 640px) {
+  .cookie-banner {
+    flex-direction: row;
+    align-items: center;
+    left: auto;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    max-width: 520px;
+  }
+  .cookie-banner-texto { flex: 1; }
+  .cookie-banner-acoes { flex-shrink: 0; }
+}
