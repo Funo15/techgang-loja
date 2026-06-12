@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:head}}
+</head>
+<body data-page="obrigado">
+{{include:header}}
+
+<main>
+  <section class="seccao seccao-obrigado">
+    <div class="obrigado-cartao" id="obrigado-cartao" hidden>
+      <span class="obrigado-icone" id="obrigado-icone" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m4.5 12.5 5 5 10-11"/>
+        </svg>
+      </span>
+      <h1 id="obrigado-titulo">Obrigado pela tua encomenda!</h1>
+      <p class="obrigado-numero">Encomenda <strong id="obrigado-numero"></strong></p>
+      <p class="obrigado-estado" id="obrigado-estado"></p>
+
+      <div class="obrigado-resumo">
+        <div id="obrigado-itens"></div>
+        <div class="resumo-linha"><span>Subtotal</span><span id="obrigado-subtotal"></span></div>
+        <div class="resumo-linha"><span>Envio</span><span id="obrigado-envio"></span></div>
+        <div class="resumo-linha resumo-total"><span>Total</span><span class="preco-display" id="obrigado-total"></span></div>
+      </div>
+
+      <p class="obrigado-prazo" id="obrigado-prazo"></p>
+      <a class="btn btn-primario" href="/produtos">Continuar a comprar</a>
+    </div>
+
+    <p class="estado-vazio" id="obrigado-nao-encontrado" hidden>
+      Encomenda não encontrada. <a href="/produtos">Voltar aos produtos</a>
+    </p>
+  </section>
+</main>
+
+{{include:footer}}
+</body>
+</html>

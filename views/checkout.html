@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:head}}
+</head>
+<body data-page="checkout">
+{{include:header}}
+
+<main>
+  <section class="seccao seccao-checkout">
+    <h1>Checkout</h1>
+    <div class="checkout-grid">
+
+      <!-- Resumo (acima em mobile, ao lado em desktop) -->
+      <aside class="carrinho-resumo checkout-resumo" id="checkout-resumo">
+        <h2>A tua encomenda</h2>
+        <div id="checkout-itens"></div>
+        <div class="resumo-linha"><span>Subtotal</span><span id="checkout-subtotal"></span></div>
+        <div class="resumo-linha"><span>Envio</span><span id="checkout-envio"></span></div>
+        <div class="resumo-linha resumo-total"><span>Total</span><span class="preco-display" id="checkout-total"></span></div>
+      </aside>
+
+      <!-- Formulário -->
+      <form class="form-checkout" id="form-checkout" novalidate>
+        <h2>Dados de envio</h2>
+
+        <div class="campo">
+          <label for="f-nome">Nome completo</label>
+          <input id="f-nome" name="nome" type="text" autocomplete="name" required>
+          <small class="erro-campo" data-erro="nome" hidden></small>
+        </div>
+
+        <div class="campo-linha">
+          <div class="campo">
+            <label for="f-email">Email</label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required>
+            <small class="erro-campo" data-erro="email" hidden></small>
+          </div>
+          <div class="campo">
+            <label for="f-telefone">Telefone</label>
+            <input id="f-telefone" name="telefone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="912345678" maxlength="9" required>
+            <small class="erro-campo" data-erro="telefone" hidden></small>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="f-morada">Morada</label>
+          <input id="f-morada" name="morada" type="text" autocomplete="street-address" required>
+          <small class="erro-campo" data-erro="morada" hidden></small>
+        </div>
+
+        <div class="campo-linha">
+          <div class="campo">
+            <label for="f-cp">Código postal</label>
+            <input id="f-cp" name="codigo_postal" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="0000-000" maxlength="8" required>
+            <small class="erro-campo" data-erro="codigo_postal" hidden></small>
+          </div>
+          <div class="campo">
+            <label for="f-cidade">Cidade</label>
+            <input id="f-cidade" name="cidade" type="text" autocomplete="address-level2" required>
+            <small class="erro-campo" data-erro="cidade" hidden></small>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="f-pais">País</label>
+          <input id="f-pais" name="pais" type="text" autocomplete="country-name" value="Portugal" required>
+          <small class="erro-campo" data-erro="pais" hidden></small>
+        </div>
+
+        <p class="erro-geral" id="checkout-erro-geral" hidden></p>
+
+        <button type="submit" class="btn btn-primario btn-largo" id="btn-pagar">Continuar para pagamento</button>
+        <p class="checkout-nota">Pagamento seguro via Stripe · cartão, MB Way ou Multibanco</p>
+      </form>
+
+    </div>
+  </section>
+</main>
+
+{{include:footer}}
+</body>
+</html>

@@ -1,0 +1,88 @@
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo" aria-label="{{NOME}} - página inicial">
+      <span class="logo-icone" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="4" r="1.3" fill="currentColor" stroke="none"/>
+          <path d="M12 5.5V8"/>
+          <rect x="4.5" y="8" width="15" height="11" rx="4"/>
+          <circle cx="9.3" cy="13.5" r="1.4" fill="currentColor" stroke="none"/>
+          <circle cx="14.7" cy="13.5" r="1.4" fill="currentColor" stroke="none"/>
+        </svg>
+      </span>
+      <span class="logo-texto">Tech<span class="logo-acento">Gang</span></span>
+    </a>
+
+    <nav class="nav" aria-label="Navegação principal">
+      <a href="/produtos" data-nav="produtos">Produtos</a>
+      <a href="/produtos?colecao=tendencias" data-nav="tendencias">Tendências</a>
+      <a href="/produtos?colecao=novidades" data-nav="novidades">Novidades</a>
+      <a href="/contactos" data-nav="sobre">Sobre</a>
+    </nav>
+
+    <div class="header-acoes">
+      <button class="btn-icone" id="btn-pesquisa" aria-label="Pesquisar produtos">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>
+        </svg>
+      </button>
+      <button class="btn-icone" id="btn-conta" aria-label="A minha conta">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"/><path d="M5 20c1.4-3 4-4.5 7-4.5s5.6 1.5 7 4.5"/>
+        </svg>
+      </button>
+      <button class="btn-carrinho" id="btn-carrinho" aria-label="Abrir carrinho">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+          <path d="M3 6h18"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="btn-carrinho-texto">Carrinho</span>
+        <span class="carrinho-contador" id="carrinho-contador" hidden>0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Pesquisa (overlay) -->
+<div class="pesquisa-overlay" id="pesquisa-overlay" hidden>
+  <div class="pesquisa-painel" role="dialog" aria-label="Pesquisar produtos">
+    <div class="pesquisa-topo">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>
+      </svg>
+      <input type="search" id="pesquisa-input" placeholder="Procura gadgets, candeeiros, áudio…" autocomplete="off">
+      <button class="btn-fechar" id="btn-fechar-pesquisa" aria-label="Fechar pesquisa">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="pesquisa-resultados" id="pesquisa-resultados"></div>
+  </div>
+</div>
+
+<!-- Drawer lateral do carrinho -->
+<div class="carrinho-overlay" id="carrinho-overlay" hidden></div>
+<aside class="carrinho-drawer" id="carrinho-drawer" aria-label="Carrinho de compras" aria-hidden="true">
+  <div class="carrinho-topo">
+    <h2>O teu carrinho</h2>
+    <button class="btn-fechar" id="btn-fechar-carrinho" aria-label="Fechar carrinho">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="carrinho-banner" id="carrinho-banner" hidden></div>
+  <div class="carrinho-itens" id="carrinho-itens">
+    <!-- preenchido por JS -->
+  </div>
+  <div class="carrinho-rodape" id="carrinho-rodape">
+    <div class="carrinho-linha">
+      <span>Subtotal</span>
+      <span class="preco-display" id="carrinho-subtotal">€0,00</span>
+    </div>
+    <a class="btn btn-contorno btn-largo" href="/carrinho">Ver carrinho</a>
+    <button class="btn btn-primario btn-largo" id="btn-checkout">Finalizar compra</button>
+  </div>
+</aside>

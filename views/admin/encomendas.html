@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:admin-head}}
+</head>
+<body data-adm-page="encomendas">
+{{include:admin-nav}}
+<main class="adm-main">
+  <div class="adm-cabeca">
+    <h1>Encomendas</h1>
+    <a class="adm-btn adm-btn-fantasma" id="btn-csv" href="#">Exportar CSV</a>
+  </div>
+
+  <div class="adm-filtros">
+    <input type="search" id="f-pesquisa" placeholder="Pesquisar nome, email ou nº…">
+    <select id="f-pagamento">
+      <option value="">Pagamento: todos</option>
+      <option value="pendente">Pendente</option>
+      <option value="paga">Paga</option>
+      <option value="reembolsada">Reembolsada</option>
+      <option value="cancelada">Cancelada</option>
+    </select>
+    <select id="f-fulfillment">
+      <option value="">Fulfillment: todos</option>
+      <option value="por_encomendar">Por encomendar</option>
+      <option value="encomendada_fornecedor">Encomendada ao fornecedor</option>
+      <option value="enviada">Enviada</option>
+      <option value="entregue">Entregue</option>
+    </select>
+  </div>
+
+  <div class="adm-tabela-wrap">
+    <table class="adm-tabela">
+      <thead><tr><th>Nº</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Fulfillment</th><th>Data</th></tr></thead>
+      <tbody id="t-encomendas"><tr><td colspan="6" class="adm-vazio">A carregar…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+<script src="/js/admin.js"></script>
+</body>
+</html>

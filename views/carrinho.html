@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:head}}
+</head>
+<body data-page="carrinho">
+{{include:header}}
+
+<main>
+  <section class="seccao seccao-carrinho">
+    <h1>O teu carrinho</h1>
+    <div class="carrinho-pagina">
+      <div class="carrinho-pagina-itens" id="pagina-carrinho-itens"></div>
+      <aside class="carrinho-resumo" id="carrinho-resumo" hidden>
+        <h2>Resumo</h2>
+        <div class="resumo-linha"><span>Subtotal</span><span id="resumo-subtotal"></span></div>
+        <div class="resumo-linha"><span>Envio</span><span id="resumo-envio"></span></div>
+        <div class="resumo-linha resumo-total"><span>Total</span><span class="preco-display" id="resumo-total"></span></div>
+        <button class="btn btn-primario btn-largo" id="btn-checkout-pagina">Finalizar compra</button>
+        <a class="btn btn-contorno btn-largo" href="/produtos">Continuar a comprar</a>
+      </aside>
+    </div>
+  </section>
+</main>
+
+{{include:footer}}
+</body>
+</html>

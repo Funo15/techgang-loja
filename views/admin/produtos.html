@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:admin-head}}
+</head>
+<body data-adm-page="produtos">
+{{include:admin-nav}}
+<main class="adm-main">
+  <div class="adm-cabeca">
+    <h1>Produtos</h1>
+    <a class="adm-btn adm-btn-primario" href="/admin/produtos/novo">+ Novo produto</a>
+  </div>
+
+  <div class="adm-tabela-wrap">
+    <table class="adm-tabela">
+      <thead><tr>
+        <th>Produto</th><th>Preço</th><th>Custo</th><th>Margem</th>
+        <th>Fornecedor</th><th>Disponível</th><th>Destaque</th><th></th>
+      </tr></thead>
+      <tbody id="t-produtos"><tr><td colspan="8" class="adm-vazio">A carregar…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+<script src="/js/admin.js"></script>
+</body>
+</html>

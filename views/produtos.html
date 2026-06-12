@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:head}}
+</head>
+<body data-page="produtos">
+{{include:header}}
+
+<main>
+  <section class="seccao seccao-listagem">
+    <h1>Produtos</h1>
+    <!-- Filtro por categoria (preenchido por JS a partir de /api/categorias) -->
+    <div class="filtros" id="filtros" role="tablist" aria-label="Filtrar por categoria">
+      <button class="filtro ativo" data-categoria="">Tudo</button>
+    </div>
+    <div class="grelha-produtos" id="grelha-produtos">
+      <div class="skeleton-card"></div><div class="skeleton-card"></div>
+      <div class="skeleton-card"></div><div class="skeleton-card"></div>
+    </div>
+    <p class="estado-vazio" id="estado-vazio" hidden>Sem produtos nesta categoria por agora. Vê <a href="/produtos">todos os produtos</a>.</p>
+  </section>
+</main>
+
+{{include:footer}}
+</body>
+</html>

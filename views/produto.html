@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:head}}
+</head>
+<body data-page="produto">
+{{include:header}}
+
+<main>
+  <section class="produto-detalhe" id="produto-detalhe">
+    <!-- Galeria -->
+    <div class="produto-galeria">
+      <div class="galeria-principal parallax-wrap">
+        <img id="galeria-imagem" src="" alt="" class="parallax" data-parallax="0.06" width="900" height="1125">
+        <span class="badge-desconto" id="badge-desconto" hidden></span>
+        <button class="btn-favorito" id="produto-favorito" aria-label="Adicionar aos favoritos">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 20s-7-4.6-9.3-8.6C1 8.4 3 5 6.4 5c2 0 3.6 1.1 4.6 2.7H12c1-1.6 2.6-2.7 4.6-2.7C20 5 22 8.4 20.3 11.4 18 15.4 12 20 12 20z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="galeria-thumbs" id="galeria-thumbs"></div>
+    </div>
+
+    <!-- Informação -->
+    <div class="produto-info">
+      <span class="pill-tendencia" id="pill-tendencia" hidden>Em tendência</span>
+      <h1 id="produto-nome"></h1>
+
+      <div class="produto-social" id="produto-social">
+        <span class="estrelas" id="produto-estrelas" aria-hidden="true"></span>
+        <strong id="produto-rating"></strong>
+        <span class="social-sep">·</span>
+        <a href="#avaliacoes" class="social-link" id="produto-avaliacoes"></a>
+        <span class="social-sep" id="tiktok-sep" hidden>·</span>
+        <span id="produto-tiktok" hidden></span>
+      </div>
+
+      <div class="produto-preco-row">
+        <span class="preco-display preco-grande" id="produto-preco"></span>
+        <span class="preco-antigo" id="produto-preco-antigo" hidden></span>
+        <span class="pill-poupanca" id="pill-poupanca" hidden></span>
+      </div>
+      <p class="produto-nota-fiscal">IVA incluído · envio calculado no checkout</p>
+
+      <p class="produto-descricao" id="produto-descricao"></p>
+
+      <div class="produto-cores" id="produto-cores" hidden>
+        <span class="rotulo-mini">Cor</span>
+        <div class="cores-swatches" id="cores-swatches" role="radiogroup" aria-label="Cor"></div>
+      </div>
+
+      <div class="produto-specs" id="produto-specs" hidden></div>
+
+      <div class="produto-acoes">
+        <div class="seletor-qtd" aria-label="Quantidade">
+          <button id="qtd-menos" aria-label="Diminuir quantidade">&minus;</button>
+          <span id="qtd-valor">1</span>
+          <button id="qtd-mais" aria-label="Aumentar quantidade">+</button>
+        </div>
+        <button class="btn btn-primario btn-largo" id="btn-adicionar">Adicionar ao carrinho</button>
+      </div>
+      <p class="produto-indisponivel" id="produto-indisponivel" hidden>Temporariamente esgotado. Volta em breve.</p>
+      <p class="produto-envio-nota" id="produto-envio-nota"></p>
+    </div>
+  </section>
+
+  <!-- Produtos relacionados -->
+  <section class="seccao" id="seccao-relacionados" hidden>
+    <div class="seccao-cabeca">
+      <h2>Também podes gostar</h2>
+    </div>
+    <div class="grelha-produtos" id="grelha-relacionados"></div>
+  </section>
+
+  <p class="estado-vazio" id="produto-nao-encontrado" hidden>Produto não encontrado. Vê <a href="/produtos">todos os produtos</a>.</p>
+
+  <!-- Barra fixa de compra (só mobile) -->
+  <div class="compra-bar" id="compra-bar" hidden>
+    <span class="preco-display" id="compra-bar-preco"></span>
+    <button class="btn btn-primario" id="compra-bar-btn">Adicionar</button>
+  </div>
+</main>
+
+{{include:footer}}
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:head}}
+</head>
+<body data-page="home">
+{{include:header}}
+
+<main>
+  <!-- Banner promo (cartão roxo, estilo app) -->
+  <section class="seccao seccao-banner">
+    <div class="banner">
+      <div class="banner-texto">
+        <h1>Tech nova para o teu setup</h1>
+        <p>Gadgets escolhidos a dedo, com envio e tracking incluídos.</p>
+        <a href="/produtos" class="btn btn-claro">Ver produtos</a>
+      </div>
+      <div class="banner-media parallax-wrap">
+        <img src="https://picsum.photos/seed/tg-hero-setup/800/800" alt="Gadgets {{NOME}}" class="parallax" data-parallax="0.12" width="800" height="800" fetchpriority="high">
+      </div>
+    </div>
+  </section>
+
+  <!-- Categorias em pills -->
+  <section class="seccao">
+    <div class="seccao-cabeca">
+      <h2>Categorias</h2>
+    </div>
+    <div class="categorias-pills">
+      <a href="/produtos?categoria=iluminacao" class="pill-categoria">Iluminação</a>
+      <a href="/produtos?categoria=audio" class="pill-categoria">Áudio</a>
+      <a href="/produtos?categoria=wearables" class="pill-categoria">Wearables</a>
+      <a href="/produtos?categoria=setup" class="pill-categoria">Setup</a>
+    </div>
+  </section>
+
+  <!-- Produtos em destaque -->
+  <section class="seccao">
+    <div class="seccao-cabeca">
+      <h2>Recomendados</h2>
+      <a href="/produtos" class="link-seta">Ver tudo</a>
+    </div>
+    <div class="grelha-destaques" id="grelha-destaques">
+      <!-- preenchido por JS; skeleton enquanto carrega -->
+      <div class="skeleton-card"></div><div class="skeleton-card"></div>
+      <div class="skeleton-card"></div><div class="skeleton-card"></div>
+    </div>
+  </section>
+
+  <!-- Bloco de confiança (cartão roxo) -->
+  <section class="seccao">
+    <div class="banda-ink">
+      <h2>Compra sem stress.</h2>
+      <div class="banda-ink-grelha">
+        <div>
+          <span class="destaque-num">8-15 dias</span>
+          <p>Entrega em Portugal com número de tracking em todas as encomendas.</p>
+        </div>
+        <div>
+          <span class="destaque-num">14 dias</span>
+          <p>Para trocar ou devolver qualquer artigo, sem perguntas.</p>
+        </div>
+        <div>
+          <span class="destaque-num" data-portes-gratis>50,00 €</span>
+          <p>Portes grátis a partir deste valor. Abaixo disso, portes fixos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+{{include:footer}}
+</body>
+</html>

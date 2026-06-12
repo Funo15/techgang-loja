@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:admin-head}}
+</head>
+<body data-adm-page="produto-form">
+{{include:admin-nav}}
+<main class="adm-main adm-main-estreito">
+  <p class="adm-voltar"><a href="/admin/produtos">← Produtos</a></p>
+  <h1 id="pf-titulo">Produto</h1>
+
+  <form id="form-produto" class="adm-form" novalidate>
+    <section class="adm-bloco">
+      <h2>Loja</h2>
+      <div class="campo">
+        <label>Nome</label>
+        <input name="nome" type="text" required>
+        <small class="adm-erro" data-erro="nome" hidden></small>
+      </div>
+      <div class="campo">
+        <label>Descrição</label>
+        <textarea name="descricao" rows="3"></textarea>
+      </div>
+      <div class="campo-linha-3">
+        <div class="campo">
+          <label>Preço (cêntimos)</label>
+          <input name="preco" type="number" min="1" step="1" placeholder="2499" required>
+          <small class="adm-erro" data-erro="preco" hidden></small>
+        </div>
+        <div class="campo">
+          <label>Preço promo (cêntimos)</label>
+          <input name="preco_promo" type="number" min="1" step="1" placeholder="vazio = sem promo">
+          <small class="adm-erro" data-erro="preco_promo" hidden></small>
+        </div>
+        <div class="campo">
+          <label>Categoria</label>
+          <input name="categoria" type="text" placeholder="iluminacao" required>
+          <small class="adm-erro" data-erro="categoria" hidden></small>
+        </div>
+      </div>
+      <div class="campo-linha-3">
+        <div class="campo">
+          <label>Rating (0-5)</label>
+          <input name="rating" type="number" min="0" max="5" step="0.1" placeholder="4.8">
+        </div>
+        <div class="campo">
+          <label>Nº avaliações</label>
+          <input name="num_avaliacoes" type="number" min="0" step="1" placeholder="540">
+        </div>
+        <div class="campo">
+          <label>Views TikTok</label>
+          <input name="tiktok_views" type="text" placeholder="128K (vazio = não mostra)">
+        </div>
+      </div>
+      <div class="adm-toggles">
+        <label><input type="checkbox" name="disponivel" checked> Disponível</label>
+        <label><input type="checkbox" name="destaque"> Destaque na home</label>
+        <label><input type="checkbox" name="em_tendencia"> Em tendência</label>
+      </div>
+      <div class="campo">
+        <label>Cores (JSON: [{"nome":"Preto","hex":"#15141A"}])</label>
+        <textarea name="cores" rows="2" class="mono"></textarea>
+        <small class="adm-erro" data-erro="cores" hidden></small>
+      </div>
+      <div class="campo">
+        <label>Specs (JSON: [{"icone":"escudo","label":"Garantia","valor":"24 meses"}])</label>
+        <textarea name="specs" rows="2" class="mono"></textarea>
+        <small class="adm-erro" data-erro="specs" hidden></small>
+      </div>
+    </section>
+
+    <section class="adm-bloco">
+      <h2>Imagens</h2>
+      <div class="adm-imagens" id="pf-imagens"></div>
+      <label class="adm-btn adm-btn-fantasma adm-upload">
+        Carregar imagens
+        <input type="file" id="pf-upload" accept="image/*" multiple hidden>
+      </label>
+      <span class="adm-ok" id="upload-estado" hidden></span>
+      <p class="adm-ajuda">Redimensionadas para máx. 1200px (webp, qualidade 80). Sem imagens, a loja usa os placeholders às riscas.</p>
+    </section>
+
+    <section class="adm-bloco">
+      <h2>Dropshipping (interno, nunca aparece na loja)</h2>
+      <div class="campo-linha-3">
+        <div class="campo">
+          <label>Fornecedor</label>
+          <input name="fornecedor" type="text" placeholder="CJ / AliExpress">
+        </div>
+        <div class="campo">
+          <label>Ref. no fornecedor</label>
+          <input name="fornecedor_product_id" type="text" placeholder="CJ-GP-2201">
+        </div>
+        <div class="campo">
+          <label>Custo (cêntimos)</label>
+          <input name="custo_fornecedor" type="number" min="0" step="1" placeholder="720">
+          <small class="adm-erro" data-erro="custo_fornecedor" hidden></small>
+        </div>
+      </div>
+      <div class="campo-linha">
+        <div class="campo">
+          <label>Link do produto no fornecedor</label>
+          <input name="fornecedor_url" type="url" placeholder="https://…">
+        </div>
+        <div class="campo">
+          <label>Tempo de envio (dias)</label>
+          <input name="tempo_envio_dias" type="text" placeholder="8-12">
+        </div>
+      </div>
+    </section>
+
+    <p class="adm-erro" id="pf-erro-geral" hidden></p>
+    <button type="submit" class="adm-btn adm-btn-primario" id="pf-guardar">Guardar produto</button>
+  </form>
+</main>
+<script src="/js/admin.js"></script>
+</body>
+</html>

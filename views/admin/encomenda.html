@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:admin-head}}
+</head>
+<body data-adm-page="encomenda">
+{{include:admin-nav}}
+<main class="adm-main">
+  <p class="adm-voltar"><a href="/admin/encomendas">← Encomendas</a></p>
+  <div class="adm-cabeca">
+    <h1 id="e-numero">—</h1>
+    <div class="adm-badges" id="e-badges"></div>
+  </div>
+
+  <div class="adm-detalhe">
+    <!-- Coluna principal -->
+    <div>
+      <section class="adm-bloco">
+        <h2>Items</h2>
+        <div id="e-items"></div>
+        <div class="adm-totais" id="e-totais"></div>
+      </section>
+
+      <section class="adm-bloco">
+        <h2>Fulfillment</h2>
+        <div class="adm-fluxo" id="e-fluxo"></div>
+      </section>
+
+      <section class="adm-bloco">
+        <h2>Notas internas</h2>
+        <textarea id="e-notas" rows="4" placeholder="Notas só para ti (fornecedor, reclamações, etc.)"></textarea>
+        <button class="adm-btn adm-btn-fantasma" id="btn-notas">Guardar notas</button>
+        <span class="adm-ok" id="notas-ok" hidden>Guardado ✓</span>
+      </section>
+    </div>
+
+    <!-- Lateral -->
+    <aside>
+      <section class="adm-bloco">
+        <h2>Cliente</h2>
+        <div class="adm-cliente" id="e-cliente"></div>
+      </section>
+      <section class="adm-bloco adm-bloco-margem">
+        <h2>Margem</h2>
+        <div id="e-margem"></div>
+      </section>
+    </aside>
+  </div>
+</main>
+<script src="/js/admin.js"></script>
+</body>
+</html>
