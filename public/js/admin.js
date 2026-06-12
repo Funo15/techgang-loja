@@ -81,16 +81,17 @@
     });
   }
 
-  // Linha de tabela de encomenda (dashboard e listagem usam a mesma)
-  function linhaEncomenda(o, comBotaoApagar = false) {
+  // Linha de tabela de encomenda (dashboard: sem checkbox/apagar; listagem: com ambos)
+  function linhaEncomenda(o, comControlos = false) {
     return `<tr${o.teste ? ' class="adm-linha-teste"' : ''}>
+      <td>${comControlos ? `<input type="checkbox" class="bulk-cb" data-num="${esc(o.numero_encomenda)}">` : ''}</td>
       <td><a href="/admin/encomendas/${o.numero_encomenda}">${o.numero_encomenda}</a>${o.teste ? ' <span class="badge badge-teste">Teste</span>' : ''}</td>
       <td>${esc(o.nome_cliente)}</td>
       <td class="num">${euro(o.total)}</td>
       <td>${badge(o.estado_pagamento)}</td>
       <td>${badge(o.estado_fulfillment)}</td>
       <td>${dataPT(o.created_at)}</td>
-      <td>${comBotaoApagar ? `<button class="adm-btn-apagar" data-num="${esc(o.numero_encomenda)}" title="Apagar">✕</button>` : ''}</td>
+      <td>${comControlos ? `<button class="adm-btn-apagar" data-num="${esc(o.numero_encomenda)}" title="Apagar">✕</button>` : ''}</td>
     </tr>`;
   }
 
@@ -155,6 +156,8 @@
       document.getElementById('c-receita').textContent = euro(r.receita30);
       document.getElementById('c-lucro').textContent = euro(r.lucro30);
       document.getElementById('c-encomendar').textContent = r.porEncomendar;
+      document.getElementById('c-visitantes').textContent = r.visitantesHoje;
+      document.getElementById('c-conversao').textContent = r.conversaoHoje + '%';
       if (r.porEncomendar > 0) document.getElementById('c-card-encomendar').classList.add('urgente');
 
       document.getElementById('t-ultimas').innerHTML = r.ultimas.length
@@ -215,11 +218,14 @@
     const fPag = document.getElementById('f-pagamento');
     const fFul = document.getElementById('f-fulfillment');
     const fTeste = document.getElementById('f-esconder-testes');
+    const fIni = document.getElementById('f-data-ini');
+    const fFim = document.getElementById('f-data-fim');
+    const bulkBar = document.getElementById('adm-bulk');
+    const bulkTodos = document.getElementById('bulk-todos');
 
-    // Filtros pré-preenchidos via URL (ex: vindos do card do dashboard)
-    const params = new URLSearchParams(location.search);
-    fPag.value = params.get('estado_pagamento') || '';
-    fFul.value = params.get('estado_fulfillment') || '';
+    const urlParams = new URLSearchParams(location.search);
+    fPag.value = urlParams.get('estado_pagamento') || '';
+    fFul.value = urlParams.get('estado_fulfillment') || '';
 
     function querystring() {
       const q = new URLSearchParams();
@@ -227,7 +233,19 @@
       if (fPag.value) q.set('estado_pagamento', fPag.value);
       if (fFul.value) q.set('estado_fulfillment', fFul.value);
       if (fTeste.checked) q.set('esconder_testes', '1');
+      if (fIni.value) q.set('data_ini', fIni.value);
+      if (fFim.value) q.set('data_fim', fFim.value);
       return q.toString();
+    }
+
+    function selecionadas() {
+      return [...document.querySelectorAll('.bulk-cb:checked')].map(cb => cb.dataset.num);
+    }
+
+    function atualizarBulkBar() {
+      const n = selecionadas().length;
+      bulkBar.hidden = n === 0;
+      document.getElementById('bulk-contagem').textContent = `${n} selecionada${n !== 1 ? 's' : ''}`;
     }
 
     async function carregar() {
@@ -235,7 +253,8 @@
       const tbody = document.getElementById('t-encomendas');
       tbody.innerHTML = lista.length
         ? lista.map(o => linhaEncomenda(o, true)).join('')
-        : '<tr><td colspan="7" class="adm-vazio">Nada encontrado com estes filtros.</td></tr>';
+        : '<tr><td colspan="8" class="adm-vazio">Nada encontrado com estes filtros.</td></tr>';
+
       tbody.querySelectorAll('.adm-btn-apagar').forEach(btn => {
         btn.addEventListener('click', async () => {
           if (!confirm(`Apagar ${btn.dataset.num}? Esta ação é irreversível.`)) return;
@@ -243,14 +262,35 @@
           carregar();
         });
       });
+      tbody.querySelectorAll('.bulk-cb').forEach(cb => cb.addEventListener('change', atualizarBulkBar));
+      bulkTodos.checked = false;
+      bulkBar.hidden = true;
       document.getElementById('btn-csv').href = `/api/admin/encomendas.csv?${querystring()}`;
     }
 
+    bulkTodos.addEventListener('change', () => {
+      document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = bulkTodos.checked; });
+      atualizarBulkBar();
+    });
+
+    document.getElementById('btn-bulk-aplicar').addEventListener('click', async () => {
+      const nums = selecionadas();
+      const acao = document.getElementById('bulk-acao').value;
+      if (!acao) return alert('Escolhe uma ação.');
+      if (acao === 'apagar' && !confirm(`Apagar ${nums.length} encomenda(s)? Irreversível.`)) return;
+      await api('/api/admin/encomendas/bulk', { method: 'POST', body: { numeros: nums, acao } });
+      carregar();
+    });
+
+    document.getElementById('btn-bulk-cancelar').addEventListener('click', () => {
+      document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = false; });
+      bulkTodos.checked = false;
+      bulkBar.hidden = true;
+    });
+
     let timer;
     pesquisa.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(carregar, 300); });
-    fPag.addEventListener('change', carregar);
-    fFul.addEventListener('change', carregar);
-    fTeste.addEventListener('change', carregar);
+    [fPag, fFul, fTeste, fIni, fFim].forEach(el => el.addEventListener('change', carregar));
     carregar();
   }
 
@@ -384,7 +424,7 @@
         return `<tr data-id="${p.id}">
           <td><span class="adm-prod-nome"><img class="adm-thumb" src="${esc(p.imagens[0] || '')}" alt="">
             <span class="${p.ativo ? '' : 'inativo'}">${esc(p.nome)}</span></span></td>
-          <td class="num">${euro(preco)}${p.preco_promo ? ` <small style="text-decoration:line-through;color:var(--cor-texto-suave)">${euro(p.preco)}</small>` : ''}</td>
+          <td class="num adm-preco-cell" data-preco="${(preco/100).toFixed(2)}" data-promo="${p.preco_promo ? (p.preco_promo/100).toFixed(2) : ''}" title="Clica para editar">${euro(preco)}${p.preco_promo ? ` <small class="riscado">${euro(p.preco)}</small>` : ''}</td>
           <td class="num">${p.custo_fornecedor != null ? euro(p.custo_fornecedor) : '—'}</td>
           <td class="num">${margem}</td>
           <td>${esc(p.fornecedor || '—')}</td>
@@ -399,12 +439,32 @@
     }
 
     document.getElementById('t-produtos').addEventListener('click', async (e) => {
+      // Edição inline de preço
+      const celulaPreco = e.target.closest('.adm-preco-cell');
+      if (celulaPreco && !celulaPreco.querySelector('input')) {
+        const id = celulaPreco.closest('tr').dataset.id;
+        const precoAtual = celulaPreco.dataset.preco;
+        const promoAtual = celulaPreco.dataset.promo;
+        celulaPreco.innerHTML = `
+          <input class="adm-preco-input" type="number" step="0.01" min="0" value="${precoAtual}" placeholder="Preço" style="width:5rem">
+          <input class="adm-preco-input" type="number" step="0.01" min="0" value="${promoAtual}" placeholder="Promo (opcional)" style="width:6rem">
+          <button class="adm-btn adm-btn-fantasma" style="padding:.2rem .5rem;font-size:.8rem">✓</button>`;
+        const [inp1, inp2, btn] = celulaPreco.querySelectorAll('input, button');
+        inp1.focus();
+        const guardar = async () => {
+          const r = await api(`/api/admin/produtos/${id}/preco`, { method: 'PATCH', body: { preco: inp1.value, preco_promo: inp2.value || null } });
+          if (r.ok) carregar();
+        };
+        btn.addEventListener('click', guardar);
+        [inp1, inp2].forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter') guardar(); if (e.key === 'Escape') carregar(); }));
+        return;
+      }
+
       const alvo = e.target.closest('[data-campo]');
       if (!alvo) return;
       e.preventDefault();
       const id = alvo.closest('tr').dataset.id;
       const campo = alvo.dataset.campo;
-      // "Apagar" = soft delete (ativo=0); confirmação só nesse caso
       if (campo === 'ativo' && alvo.textContent === 'Desativar' &&
           !confirm('Desativar este produto? Deixa de aparecer na loja (não é apagado da BD).')) return;
       const r = await api(`/api/admin/produtos/${id}/toggle`, { method: 'PATCH', body: { campo } });

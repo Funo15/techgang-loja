@@ -221,6 +221,14 @@ textarea { resize: vertical; }
 .adm-filtros input[type="search"] { min-width: 0; }
 .adm-check-label { display: flex; align-items: center; gap: .4rem; font-size: .85rem; color: var(--cor-texto-suave); cursor: pointer; }
 .adm-notas-acoes { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .5rem; }
+/* Bulk action bar */
+.adm-bulk { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; padding: .6rem .8rem; background: color-mix(in srgb, var(--cor-acento) 8%, var(--cor-fundo-elevado)); border: 1px solid color-mix(in srgb, var(--cor-acento) 20%, var(--cor-linha)); border-radius: 10px; margin-bottom: .8rem; font-size: .875rem; }
+.adm-bulk select { font-size: .875rem; }
+/* Preço inline */
+.adm-preco-cell { cursor: pointer; }
+.adm-preco-cell:hover { background: color-mix(in srgb, var(--cor-acento) 6%, transparent); border-radius: 4px; }
+.adm-preco-input { border: 1px solid var(--cor-linha); border-radius: 6px; padding: .15rem .4rem; font-size: .85rem; }
+.riscado { text-decoration: line-through; color: var(--cor-texto-suave); }
 
 /* ---------- Tabelas ---------- */
 .adm-tabela-wrap {

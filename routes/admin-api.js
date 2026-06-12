@@ -77,8 +77,11 @@ router.get('/resumo', (req, res) => {
     return dias;
   })();
 
+  const encomendasHoje = db.prepare(`SELECT COUNT(*) AS c FROM orders WHERE date(created_at) = date('now')`).get().c;
+  const visitantesHoje = db.prepare(`SELECT COUNT(*) AS c FROM daily_visitors WHERE dia = date('now')`).get().c;
+
   res.json({
-    hoje: db.prepare(`SELECT COUNT(*) AS c FROM orders WHERE date(created_at) = date('now')`).get().c,
+    hoje: encomendasHoje,
     dias7: contar(7),
     dias30: contar(30),
     receita30,
@@ -86,6 +89,8 @@ router.get('/resumo', (req, res) => {
     receitaHoje,
     porEncomendar,
     grafico7dias,
+    visitantesHoje,
+    conversaoHoje: visitantesHoje > 0 ? +((encomendasHoje / visitantesHoje) * 100).toFixed(1) : 0,
     ultimas
   });
 });
@@ -99,6 +104,8 @@ function filtrarEncomendas(query) {
   if (query.estado_pagamento) { condicoes.push('estado_pagamento = ?'); params.push(query.estado_pagamento); }
   if (query.estado_fulfillment) { condicoes.push('estado_fulfillment = ?'); params.push(query.estado_fulfillment); }
   if (query.esconder_testes === '1') { condicoes.push('teste = 0'); }
+  if (query.data_ini) { condicoes.push('date(created_at) >= ?'); params.push(query.data_ini); }
+  if (query.data_fim) { condicoes.push('date(created_at) <= ?'); params.push(query.data_fim); }
   if (query.q) {
     condicoes.push('(nome_cliente LIKE ? OR email LIKE ? OR numero_encomenda LIKE ?)');
     const termo = `%${query.q}%`;
@@ -209,6 +216,16 @@ router.post('/encomendas/:numero/notas', (req, res) => {
     .run(notas, req.params.numero);
   if (r.changes === 0) return res.status(404).json({ erro: 'Encomenda não encontrada' });
   res.json({ ok: true });
+});
+
+router.post('/encomendas/bulk', (req, res) => {
+  const { numeros = [], acao } = req.body || {};
+  if (!Array.isArray(numeros) || numeros.length === 0) return res.status(400).json({ erro: 'Nenhuma encomenda selecionada.' });
+  const acoes = { apagar: 'DELETE FROM orders WHERE numero_encomenda = ?', teste: 'UPDATE orders SET teste = 1 WHERE numero_encomenda = ?', nao_teste: 'UPDATE orders SET teste = 0 WHERE numero_encomenda = ?' };
+  if (!acoes[acao]) return res.status(400).json({ erro: 'Ação inválida.' });
+  const stmt = db.prepare(acoes[acao]);
+  db.transaction((lista) => lista.forEach(n => stmt.run(n)))(numeros);
+  res.json({ ok: true, afetadas: numeros.length });
 });
 
 router.delete('/encomendas/:numero', (req, res) => {
@@ -331,6 +348,18 @@ router.put('/produtos/:id', (req, res) => {
 });
 
 // Toggles rápidos na tabela + soft delete (ativo=0, NUNCA apagar da BD)
+router.patch('/produtos/:id/preco', (req, res) => {
+  const id = Number(req.params.id);
+  const preco = Math.round(Number(req.body?.preco) * 100);
+  const promoRaw = req.body?.preco_promo;
+  const preco_promo = promoRaw ? Math.round(Number(promoRaw) * 100) : null;
+  if (!Number.isFinite(preco) || preco < 0) return res.status(400).json({ erro: 'Preço inválido.' });
+  if (preco_promo !== null && (!Number.isFinite(preco_promo) || preco_promo < 0)) return res.status(400).json({ erro: 'Preço promo inválido.' });
+  const r = db.prepare('UPDATE products SET preco = ?, preco_promo = ? WHERE id = ?').run(preco, preco_promo, id);
+  if (r.changes === 0) return res.status(404).json({ erro: 'Produto não encontrado' });
+  res.json({ ok: true, preco, preco_promo });
+});
+
 router.patch('/produtos/:id/toggle', (req, res) => {
   const campo = req.body?.campo;
   if (!['disponivel', 'destaque', 'ativo'].includes(campo)) {

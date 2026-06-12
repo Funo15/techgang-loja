@@ -86,6 +86,13 @@ CREATE TABLE IF NOT EXISTS customer_sessions (
   FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 );
 
+-- Visitantes únicos por dia (para taxa de conversão)
+CREATE TABLE IF NOT EXISTS daily_visitors (
+  hash TEXT NOT NULL,
+  dia  TEXT NOT NULL,
+  PRIMARY KEY (hash, dia)
+);
+
 -- Índices para as queries mais comuns
 CREATE INDEX IF NOT EXISTS idx_products_categoria ON products (categoria);
 CREATE INDEX IF NOT EXISTS idx_products_ativo ON products (ativo, disponivel);
