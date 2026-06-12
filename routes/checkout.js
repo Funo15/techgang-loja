@@ -135,24 +135,11 @@ router.post('/checkout', async (req, res) => {
     metadata: { numero_encomenda: numero },
     success_url: `${BASE_URL}/obrigado?enc=${numero}`,
     cancel_url: `${BASE_URL}/checkout`,
-    // Cartão + MB Way + Multibanco — têm de estar ativos no dashboard
-    // do Stripe (Settings → Payment methods), ver README
-    payment_method_types: ['card', 'mb_way', 'multibanco']
+    automatic_payment_methods: { enabled: true }
   };
 
   try {
-    let session;
-    try {
-      session = await stripe.checkout.sessions.create(params);
-    } catch (err) {
-      // Conta ainda sem MB Way/Multibanco ativos → tenta só com cartão
-      if (err.type === 'StripeInvalidRequestError' && /payment_method_types/.test(err.message)) {
-        console.warn('[checkout] MB Way/Multibanco indisponíveis nesta conta Stripe — a usar só cartão. Ativa-os no dashboard.');
-        session = await stripe.checkout.sessions.create({ ...params, payment_method_types: ['card'] });
-      } else {
-        throw err;
-      }
-    }
+    const session = await stripe.checkout.sessions.create(params);
     res.json({ url: session.url });
   } catch (err) {
     console.error(`[checkout] erro Stripe na encomenda ${numero}: [${err.type}] ${err.message}`);
