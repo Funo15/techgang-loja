@@ -1310,6 +1310,7 @@ body[data-page="produto"] main { padding-bottom: 90px; }
    BANNER DE COOKIES (RGPD)
    ============================================================ */
 
+.cookie-banner[hidden] { display: none; }
 .cookie-banner {
   position: fixed;
   bottom: 1rem;
