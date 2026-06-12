@@ -13,7 +13,7 @@ const db = require('../db/database');
 const config = require('../config');
 const { enviarEmailTracking } = require('../lib/email');
 const { registarTracking } = require('../lib/track17');
-const { encomendaPaga, estadoAlterado, backupConcluido } = require('../lib/logger');
+const { encomendaPaga, estadoAlterado } = require('../lib/logger');
 const { fazerBackup, limparBackupsAntigos } = require('../lib/backup');
 
 const router = express.Router();
@@ -345,7 +345,6 @@ router.post('/backup', async (req, res) => {
   try {
     const { nome } = await fazerBackup();
     limparBackupsAntigos();
-    backupConcluido(nome);
     res.json({ ok: true, nome });
   } catch (err) {
     console.error(`[admin] backup manual falhou: ${err.message}`);
