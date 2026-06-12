@@ -134,8 +134,7 @@ router.post('/checkout', async (req, res) => {
     customer_email: cliente.email.trim(),
     metadata: { numero_encomenda: numero },
     success_url: `${BASE_URL}/obrigado?enc=${numero}`,
-    cancel_url: `${BASE_URL}/checkout`,
-    automatic_payment_methods: { enabled: true }
+    cancel_url: `${BASE_URL}/checkout`
   };
 
   try {
