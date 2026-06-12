@@ -1316,8 +1316,8 @@ body[data-page="produto"] main { padding-bottom: 90px; }
   right: 1rem;
   left: 1rem;
   z-index: 9999;
-  background: var(--cor-texto);
-  color: var(--cor-fundo);
+  background: #1e1b2e;
+  color: #f0eeff;
   border-radius: 12px;
   padding: .75rem 1rem;
   box-shadow: 0 8px 32px rgba(0,0,0,.22);
@@ -1347,7 +1347,7 @@ body[data-page="produto"] main { padding-bottom: 90px; }
 
 .cookie-banner .btn-contorno {
   border-color: rgba(255,255,255,.3);
-  color: var(--cor-fundo);
+  color: #f0eeff;
   font-size: .78rem;
   padding: .35rem .8rem;
 }
