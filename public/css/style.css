@@ -1346,14 +1346,15 @@ body[data-page="produto"] main { padding-bottom: 90px; }
 }
 
 .cookie-banner .btn-contorno {
-  border-color: rgba(255,255,255,.3);
+  border-color: rgba(255,255,255,.4);
   color: #f0eeff;
+  background: rgba(255,255,255,.12);
   font-size: .78rem;
   padding: .35rem .8rem;
 }
 .cookie-banner .btn-contorno:hover {
-  border-color: rgba(255,255,255,.6);
-  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.7);
+  background: rgba(255,255,255,.2);
 }
 .cookie-banner .btn-primario {
   font-size: .78rem;
