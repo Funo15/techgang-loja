@@ -82,7 +82,7 @@
   }
 
   // Linha de tabela de encomenda (dashboard e listagem usam a mesma)
-  function linhaEncomenda(o) {
+  function linhaEncomenda(o, comBotaoApagar = false) {
     return `<tr${o.teste ? ' class="adm-linha-teste"' : ''}>
       <td><a href="/admin/encomendas/${o.numero_encomenda}">${o.numero_encomenda}</a>${o.teste ? ' <span class="badge badge-teste">Teste</span>' : ''}</td>
       <td>${esc(o.nome_cliente)}</td>
@@ -90,6 +90,7 @@
       <td>${badge(o.estado_pagamento)}</td>
       <td>${badge(o.estado_fulfillment)}</td>
       <td>${dataPT(o.created_at)}</td>
+      <td>${comBotaoApagar ? `<button class="adm-btn-apagar" data-num="${esc(o.numero_encomenda)}" title="Apagar">✕</button>` : ''}</td>
     </tr>`;
   }
 
@@ -180,10 +181,17 @@
 
     async function carregar() {
       const lista = await api(`/api/admin/encomendas?${querystring()}`);
-      document.getElementById('t-encomendas').innerHTML = lista.length
-        ? lista.map(linhaEncomenda).join('')
-        : '<tr><td colspan="6" class="adm-vazio">Nada encontrado com estes filtros.</td></tr>';
-      // O CSV exporta exatamente o que está filtrado
+      const tbody = document.getElementById('t-encomendas');
+      tbody.innerHTML = lista.length
+        ? lista.map(o => linhaEncomenda(o, true)).join('')
+        : '<tr><td colspan="7" class="adm-vazio">Nada encontrado com estes filtros.</td></tr>';
+      tbody.querySelectorAll('.adm-btn-apagar').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm(`Apagar ${btn.dataset.num}? Esta ação é irreversível.`)) return;
+          await api(`/api/admin/encomendas/${encodeURIComponent(btn.dataset.num)}`, { method: 'DELETE' });
+          carregar();
+        });
+      });
       document.getElementById('btn-csv').href = `/api/admin/encomendas.csv?${querystring()}`;
     }
 

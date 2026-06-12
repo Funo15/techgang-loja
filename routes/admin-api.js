@@ -188,6 +188,12 @@ router.post('/encomendas/:numero/notas', (req, res) => {
   res.json({ ok: true });
 });
 
+router.delete('/encomendas/:numero', (req, res) => {
+  const r = db.prepare('DELETE FROM orders WHERE numero_encomenda = ?').run(req.params.numero);
+  if (r.changes === 0) return res.status(404).json({ erro: 'Encomenda não encontrada' });
+  res.json({ ok: true });
+});
+
 router.post('/encomendas/:numero/teste', (req, res) => {
   const o = db.prepare('SELECT teste FROM orders WHERE numero_encomenda = ?').get(req.params.numero);
   if (!o) return res.status(404).json({ erro: 'Encomenda não encontrada' });

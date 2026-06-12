@@ -240,6 +240,8 @@ textarea { resize: vertical; }
 .badge-cancelada { background: #ECEBF1; color: #6B6877; }
 .badge-teste { background: #F0F0F0; color: #888; }
 .adm-linha-teste td { opacity: .55; }
+.adm-btn-apagar { background: none; border: none; color: #ccc; cursor: pointer; font-size: .9rem; padding: .2rem .4rem; border-radius: 4px; }
+.adm-btn-apagar:hover { background: #fee; color: #c0392b; }
 .badge-por_encomendar { background: color-mix(in srgb, var(--cor-acento) 12%, #fff); color: var(--cor-acento); }
 .badge-encomendada_fornecedor { background: #E0EDF9; color: #1D5B8F; }
 .badge-enviada { background: #E8E4FA; color: #4D36A8; }
