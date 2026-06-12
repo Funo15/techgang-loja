@@ -36,6 +36,9 @@ app.post('/api/ping', (req, res) => {
   res.json({ ok: true });
 });
 
+// Área de cliente
+app.use('/api/conta', require('./routes/conta'));
+
 // Admin: API e páginas protegidas por password (.env ADMIN_PASSWORD)
 const { exigirAdmin } = require('./lib/admin-auth');
 app.get('/api/admin/live', exigirAdmin, (req, res) => visitantes.subscrever(res));

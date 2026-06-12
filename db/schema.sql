@@ -67,7 +67,27 @@ CREATE TABLE IF NOT EXISTS orders (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Clientes registados
+CREATE TABLE IF NOT EXISTS customers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  salt TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Sessões de clientes
+CREATE TABLE IF NOT EXISTS customer_sessions (
+  token TEXT PRIMARY KEY,
+  customer_id INTEGER NOT NULL,
+  expires_at TEXT NOT NULL,
+  FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
+);
+
 -- Índices para as queries mais comuns
 CREATE INDEX IF NOT EXISTS idx_products_categoria ON products (categoria);
 CREATE INDEX IF NOT EXISTS idx_products_ativo ON products (ativo, disponivel);
 CREATE INDEX IF NOT EXISTS idx_orders_estado ON orders (estado_pagamento, estado_fulfillment);
+CREATE INDEX IF NOT EXISTS idx_customers_email ON customers (email);
+CREATE INDEX IF NOT EXISTS idx_sessions_customer ON customer_sessions (customer_id);

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>{{include:head}}</head>
+<body>
+{{include:header}}
+<main class="conta-area">
+  <div class="conta-area-inner">
+    <a href="/conta/encomendas" class="enc-voltar">← Voltar às encomendas</a>
+    <div id="enc-loading" class="enc-estado">A carregar…</div>
+    <div id="enc-detalhe" hidden></div>
+  </div>
+</main>
+{{include:footer}}
+<script>
+(function() {
+  const numero = location.pathname.split('/').pop();
+  const fmt = v => (v / 100).toFixed(2).replace('.', ',') + ' €';
+  const fmtData = s => new Date(s).toLocaleDateString('pt-PT', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  const ESTADOS_PAG = { pendente:'Pendente', paga:'Paga', reembolsada:'Reembolsada', cancelada:'Cancelada' };
+  const ESTADOS_FUL = { por_encomendar:'A processar', encomendada_fornecedor:'Encomendada ao fornecedor', enviada:'Enviada', entregue:'Entregue' };
+  const COR_PAG = { paga:'verde', pendente:'laranja', reembolsada:'cinza', cancelada:'vermelho' };
+  const COR_FUL = { por_encomendar:'cinza', encomendada_fornecedor:'azul', enviada:'roxo', entregue:'verde' };
+
+  fetch('/api/conta/eu').then(r => r.ok ? r.json() : null).then(c => {
+    if (!c) location.href = '/conta';
+  });
+
+  fetch(`/api/conta/encomendas/${numero}`).then(r => {
+    if (!r.ok) { document.getElementById('enc-loading').textContent = 'Encomenda não encontrada.'; return null; }
+    return r.json();
+  }).then(e => {
+    if (!e) return;
+    document.getElementById('enc-loading').hidden = true;
+    const items = JSON.parse(e.items || '[]');
+    const det = document.getElementById('enc-detalhe');
+    det.hidden = false;
+    det.innerHTML = `
+      <div class="enc-det-topo">
+        <div>
+          <h1 class="enc-det-numero">${e.numero_encomenda}</h1>
+          <p class="enc-data">${fmtData(e.created_at)}</p>
+        </div>
+        <div class="enc-pills">
+          <span class="enc-pill enc-pill--${COR_PAG[e.estado_pagamento]}">${ESTADOS_PAG[e.estado_pagamento]}</span>
+          <span class="enc-pill enc-pill--${COR_FUL[e.estado_fulfillment]}">${ESTADOS_FUL[e.estado_fulfillment]}</span>
+        </div>
+      </div>
+
+      ${e.tracking_number ? `
+      <div class="enc-rastreio-caixa">
+        <h2>Rastreio</h2>
+        <p>Número: <strong>${e.tracking_number}</strong></p>
+        ${e.tracking_url ? `<a href="${e.tracking_url}" target="_blank" rel="noopener" class="btn btn-contorno btn-sm" style="margin-top:.5rem">Rastrear envio →</a>` : ''}
+      </div>` : ''}
+
+      <div class="enc-secao">
+        <h2>Artigos</h2>
+        <div class="enc-items">
+          ${items.map(i => `
+          <div class="enc-item">
+            <div class="enc-item-info">
+              <span class="enc-item-nome">${i.nome}</span>
+              ${i.cor ? `<span class="enc-item-variante">${i.cor}</span>` : ''}
+            </div>
+            <div class="enc-item-preco">
+              <span class="enc-item-qtd">×${i.qtd}</span>
+              <span>${fmt(i.preco_unit * i.qtd)}</span>
+            </div>
+          </div>`).join('')}
+        </div>
+        <div class="enc-totais">
+          <div class="enc-total-linha"><span>Subtotal</span><span>${fmt(e.subtotal)}</span></div>
+          <div class="enc-total-linha"><span>Portes</span><span>${e.portes === 0 ? 'Grátis' : fmt(e.portes)}</span></div>
+          <div class="enc-total-linha enc-total-final"><span>Total</span><span>${fmt(e.total)}</span></div>
+        </div>
+      </div>
+
+      <div class="enc-secao">
+        <h2>Morada de entrega</h2>
+        <address class="enc-morada">
+          ${e.nome_cliente}<br>
+          ${e.morada}<br>
+          ${e.codigo_postal} ${e.cidade}<br>
+          ${e.pais}
+        </address>
+      </div>
+    `;
+  });
+})();
+</script>
+</body>
+</html>

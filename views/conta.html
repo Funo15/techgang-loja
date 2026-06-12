@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>{{include:head}}</head>
+<body>
+{{include:header}}
+<main class="conta-pagina">
+  <div class="conta-caixa">
+    <div class="conta-tabs">
+      <button class="conta-tab ativa" data-tab="entrar">Entrar</button>
+      <button class="conta-tab" data-tab="registar">Criar conta</button>
+    </div>
+
+    <!-- Login -->
+    <form class="conta-form" id="form-entrar">
+      <h1 class="conta-titulo">Bem-vindo de volta</h1>
+      <div class="campo-grupo">
+        <label for="entrar-email">Email</label>
+        <input type="email" id="entrar-email" name="email" placeholder="o.teu@email.com" required autocomplete="email">
+      </div>
+      <div class="campo-grupo">
+        <label for="entrar-pass">Password</label>
+        <input type="password" id="entrar-pass" name="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <div class="conta-erro" id="entrar-erro" hidden></div>
+      <button type="submit" class="btn btn-primario btn-largo conta-submit">Entrar</button>
+    </form>
+
+    <!-- Registo -->
+    <form class="conta-form" id="form-registar" hidden>
+      <h1 class="conta-titulo">Criar conta</h1>
+      <div class="campo-grupo">
+        <label for="reg-nome">Nome</label>
+        <input type="text" id="reg-nome" name="nome" placeholder="O teu nome" required autocomplete="name">
+      </div>
+      <div class="campo-grupo">
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" name="email" placeholder="o.teu@email.com" required autocomplete="email">
+      </div>
+      <div class="campo-grupo">
+        <label for="reg-pass">Password</label>
+        <input type="password" id="reg-pass" name="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
+      </div>
+      <div class="conta-erro" id="reg-erro" hidden></div>
+      <button type="submit" class="btn btn-primario btn-largo conta-submit">Criar conta</button>
+      <p class="conta-legal">Ao criar conta aceitas os nossos <a href="/termos">Termos e Condições</a> e <a href="/privacidade">Política de Privacidade</a>.</p>
+    </form>
+  </div>
+</main>
+{{include:footer}}
+<script>
+(function() {
+  const tabs = document.querySelectorAll('.conta-tab');
+  const formEntrar = document.getElementById('form-entrar');
+  const formReg = document.getElementById('form-registar');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('ativa'));
+      tab.classList.add('ativa');
+      const qual = tab.dataset.tab;
+      formEntrar.hidden = qual !== 'entrar';
+      formReg.hidden = qual !== 'registar';
+    });
+  });
+
+  // Activar tab via URL ?tab=registar
+  const params = new URLSearchParams(location.search);
+  if (params.get('tab') === 'registar') tabs[1].click();
+
+  async function enviar(url, dados, erroEl, btn) {
+    btn.disabled = true;
+    btn.textContent = 'A processar…';
+    erroEl.hidden = true;
+    try {
+      const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) });
+      const d = await r.json();
+      if (!r.ok) {
+        erroEl.textContent = d.erro || 'Erro desconhecido.';
+        erroEl.hidden = false;
+        btn.disabled = false;
+        btn.textContent = url.includes('entrar') ? 'Entrar' : 'Criar conta';
+        return;
+      }
+      const redir = params.get('redir');
+      location.href = redir && redir.startsWith('/conta') ? redir : '/conta/encomendas';
+    } catch {
+      erroEl.textContent = 'Erro de ligação.';
+      erroEl.hidden = false;
+      btn.disabled = false;
+      btn.textContent = url.includes('entrar') ? 'Entrar' : 'Criar conta';
+    }
+  }
+
+  formEntrar.addEventListener('submit', e => {
+    e.preventDefault();
+    const fd = new FormData(formEntrar);
+    enviar('/api/conta/entrar', { email: fd.get('email'), password: fd.get('password') },
+      document.getElementById('entrar-erro'), formEntrar.querySelector('.conta-submit'));
+  });
+
+  formReg.addEventListener('submit', e => {
+    e.preventDefault();
+    const fd = new FormData(formReg);
+    enviar('/api/conta/registar', { nome: fd.get('nome'), email: fd.get('email'), password: fd.get('password') },
+      document.getElementById('reg-erro'), formReg.querySelector('.conta-submit'));
+  });
+})();
+</script>
+</body>
+</html>

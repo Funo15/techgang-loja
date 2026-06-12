@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>{{include:head}}</head>
+<body>
+{{include:header}}
+<main class="conta-area">
+  <div class="conta-area-inner">
+    <div class="conta-area-topo">
+      <div>
+        <h1 id="conta-saudacao">As minhas encomendas</h1>
+        <p id="conta-email" class="conta-email-label"></p>
+      </div>
+      <button class="btn btn-contorno btn-sm" id="btn-sair">Sair</button>
+    </div>
+
+    <div id="enc-loading" class="enc-estado">A carregar…</div>
+    <div id="enc-vazio" class="enc-estado" hidden>
+      <p>Ainda não tens encomendas.</p>
+      <a href="/produtos" class="btn btn-primario" style="margin-top:1rem">Ver produtos</a>
+    </div>
+    <div id="enc-lista" class="enc-lista" hidden></div>
+  </div>
+</main>
+{{include:footer}}
+<script>
+(function() {
+  const fmt = v => (v / 100).toFixed(2).replace('.', ',') + ' €';
+  const fmtData = s => new Date(s).toLocaleDateString('pt-PT', { day:'2-digit', month:'long', year:'numeric' });
+
+  const ESTADOS_PAG = { pendente:'Pendente', paga:'Paga', reembolsada:'Reembolsada', cancelada:'Cancelada' };
+  const ESTADOS_FUL = { por_encomendar:'A processar', encomendada_fornecedor:'Encomendada', enviada:'Enviada', entregue:'Entregue' };
+  const COR_PAG = { paga:'verde', pendente:'laranja', reembolsada:'cinza', cancelada:'vermelho' };
+  const COR_FUL = { por_encomendar:'cinza', encomendada_fornecedor:'azul', enviada:'roxo', entregue:'verde' };
+
+  fetch('/api/conta/eu').then(r => r.ok ? r.json() : null).then(c => {
+    if (!c) return location.href = '/conta';
+    document.getElementById('conta-saudacao').textContent = 'Olá, ' + c.nome.split(' ')[0];
+    document.getElementById('conta-email-label') && (document.getElementById('conta-email-label').textContent = c.email);
+    document.getElementById('conta-email').textContent = c.email;
+  });
+
+  fetch('/api/conta/encomendas').then(r => r.ok ? r.json() : []).then(lista => {
+    document.getElementById('enc-loading').hidden = true;
+    if (!lista.length) { document.getElementById('enc-vazio').hidden = false; return; }
+    const el = document.getElementById('enc-lista');
+    el.hidden = false;
+    el.innerHTML = lista.map(e => {
+      const items = JSON.parse(e.items || '[]');
+      const resumo = items.map(i => `${i.nome} ×${i.qtd}`).join(', ');
+      return `<a class="enc-cartao" href="/conta/encomenda/${e.numero_encomenda}">
+        <div class="enc-cartao-topo">
+          <span class="enc-numero">${e.numero_encomenda}</span>
+          <span class="enc-data">${fmtData(e.created_at)}</span>
+        </div>
+        <p class="enc-resumo">${resumo}</p>
+        <div class="enc-cartao-rodape">
+          <span class="enc-total">${fmt(e.total)}</span>
+          <div class="enc-pills">
+            <span class="enc-pill enc-pill--${COR_PAG[e.estado_pagamento]}">${ESTADOS_PAG[e.estado_pagamento]}</span>
+            <span class="enc-pill enc-pill--${COR_FUL[e.estado_fulfillment]}">${ESTADOS_FUL[e.estado_fulfillment]}</span>
+          </div>
+        </div>
+        ${e.tracking_number ? `<p class="enc-tracking">Rastreio: <strong>${e.tracking_number}</strong></p>` : ''}
+      </a>`;
+    }).join('');
+  });
+
+  document.getElementById('btn-sair').addEventListener('click', () => {
+    fetch('/api/conta/sair', { method: 'POST' }).then(() => location.href = '/');
+  });
+})();
+</script>
+</body>
+</html>

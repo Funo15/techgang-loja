@@ -109,4 +109,22 @@ router.get('/privacidade', (req, res) => res.send(render('privacidade', { TITULO
 router.get('/devolucoes', (req, res) => res.send(render('devolucoes', { TITULO: `Trocas e Devoluções | ${config.nome}` })));
 router.get('/contactos', (req, res) => res.send(render('contactos', { TITULO: `Contactos | ${config.nome}` })));
 
+// Área de cliente
+const { getCliente } = require('../lib/conta-auth');
+router.get('/conta', (req, res) => {
+  const c = getCliente(req);
+  if (c) return res.redirect('/conta/encomendas');
+  res.send(render('conta', { TITULO: `A minha conta | ${config.nome}` }));
+});
+router.get('/conta/encomendas', (req, res) => {
+  const c = getCliente(req);
+  if (!c) return res.redirect('/conta');
+  res.send(render('conta-encomendas', { TITULO: `As minhas encomendas | ${config.nome}` }));
+});
+router.get('/conta/encomenda/:numero', (req, res) => {
+  const c = getCliente(req);
+  if (!c) return res.redirect('/conta');
+  res.send(render('conta-encomenda', { TITULO: `Encomenda | ${config.nome}` }));
+});
+
 module.exports = router;
