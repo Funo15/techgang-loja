@@ -189,6 +189,32 @@ textarea { resize: vertical; }
 /* O número mais importante: por encomendar ao fornecedor > 0 fica roxo */
 .adm-card.urgente { background: var(--cor-acento); border-color: var(--cor-acento); }
 .adm-card.urgente small, .adm-card.urgente strong { color: var(--cor-acento-texto); }
+.adm-card-destaque { background: color-mix(in srgb, var(--cor-acento) 8%, var(--cor-fundo-elevado)); border-color: color-mix(in srgb, var(--cor-acento) 20%, var(--cor-linha)); }
+.adm-card-destaque small { color: var(--cor-acento); }
+
+/* Gráfico de barras */
+.adm-grafico-wrap { margin-bottom: 2rem; }
+.adm-grafico-wrap h2 { margin-bottom: .8rem; }
+.adm-grafico {
+  display: flex; align-items: flex-end; gap: .5rem;
+  height: 100px; background: var(--cor-fundo-elevado);
+  border: 1px solid var(--cor-linha); border-radius: 14px;
+  padding: 1rem 1rem .5rem; overflow: hidden;
+}
+.adm-barra-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: .25rem; height: 100%; }
+.adm-barra-val { font-size: .7rem; font-weight: 700; color: var(--cor-acento); min-height: 1rem; }
+.adm-barra { width: 100%; min-height: 2px; border-radius: 4px 4px 0 0; background: var(--cor-acento); opacity: .7; transition: height .4s ease; }
+.adm-barra-label { font-size: .68rem; color: var(--cor-texto-suave); white-space: nowrap; }
+
+/* Toast de nova encomenda */
+.adm-toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+  background: var(--cor-acento); color: var(--cor-acento-texto);
+  padding: .75rem 1.2rem; border-radius: 12px;
+  font-weight: 700; font-size: .95rem; box-shadow: 0 4px 20px rgba(0,0,0,.18);
+  animation: toast-in .25s ease;
+}
+@keyframes toast-in { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
 
 /* ---------- Filtros ---------- */
 .adm-filtros { display: grid; grid-template-columns: 1fr; gap: 0.6rem; margin-bottom: 1rem; }
@@ -356,11 +382,11 @@ textarea { resize: vertical; }
 
 /* ---------- Desktop ---------- */
 @media (min-width: 720px) {
-  .adm-cards { grid-template-columns: repeat(3, 1fr); }
+  .adm-cards { grid-template-columns: repeat(4, 1fr); }
   .adm-filtros { grid-template-columns: 1.4fr 1fr 1fr auto; align-items: center; }
   .adm-detalhe { grid-template-columns: 1.5fr 1fr; align-items: start; }
   .campo-linha-3 { grid-template-columns: repeat(3, 1fr); }
 }
 @media (min-width: 1000px) {
-  .adm-cards { grid-template-columns: repeat(6, 1fr); }
+  .adm-cards { grid-template-columns: repeat(7, 1fr); }
 }

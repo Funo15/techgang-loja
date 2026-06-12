@@ -56,13 +56,36 @@ router.get('/resumo', (req, res) => {
     FROM orders ORDER BY created_at DESC LIMIT 10
   `).all();
 
+  const receitaHoje = db.prepare(`
+    SELECT COALESCE(SUM(total), 0) AS v FROM orders
+    WHERE estado_pagamento = 'paga' AND date(created_at) = date('now')
+  `).get().v;
+
+  const grafico7dias = (() => {
+    const rows = db.prepare(`
+      SELECT date(created_at) AS dia, COUNT(*) AS n, COALESCE(SUM(total), 0) AS receita
+      FROM orders WHERE created_at >= datetime('now', '-6 days')
+      GROUP BY date(created_at) ORDER BY dia
+    `).all();
+    // Preenche os dias sem encomendas com zeros
+    const mapa = Object.fromEntries(rows.map(r => [r.dia, r]));
+    const dias = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10);
+      dias.push(mapa[d] || { dia: d, n: 0, receita: 0 });
+    }
+    return dias;
+  })();
+
   res.json({
     hoje: db.prepare(`SELECT COUNT(*) AS c FROM orders WHERE date(created_at) = date('now')`).get().c,
     dias7: contar(7),
     dias30: contar(30),
     receita30,
     lucro30,
+    receitaHoje,
     porEncomendar,
+    grafico7dias,
     ultimas
   });
 });

@@ -107,21 +107,72 @@
       document.getElementById('live-carrinho').textContent = d.comCarrinho;
     };
 
-    (async () => {
+    function tocarNotificacao() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [880, 1100, 1320].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.frequency.value = freq; osc.type = 'sine';
+          const t = ctx.currentTime + i * 0.13;
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(0.25, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+          osc.start(t); osc.stop(t + 0.28);
+        });
+      } catch {}
+    }
+
+    function mostrarToast(msg) {
+      const t = document.getElementById('adm-toast');
+      t.textContent = msg; t.hidden = false;
+      setTimeout(() => { t.hidden = true; }, 4000);
+    }
+
+    function renderGrafico(dias) {
+      const max = Math.max(...dias.map(d => d.n), 1);
+      const DIAS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+      document.getElementById('adm-grafico').innerHTML = dias.map(d => {
+        const pct = Math.round((d.n / max) * 100);
+        const label = DIAS_PT[new Date(d.dia + 'T12:00:00').getDay()];
+        return `<div class="adm-barra-wrap">
+          <span class="adm-barra-val">${d.n > 0 ? d.n : ''}</span>
+          <div class="adm-barra" style="height:${pct}%"></div>
+          <span class="adm-barra-label">${label}</span>
+        </div>`;
+      }).join('');
+    }
+
+    let ultimaEncomenda = null;
+
+    async function atualizarResumo(primeiro = false) {
       const r = await api('/api/admin/resumo');
       document.getElementById('c-hoje').textContent = r.hoje;
+      document.getElementById('c-receita-hoje').textContent = euro(r.receitaHoje);
       document.getElementById('c-7').textContent = r.dias7;
       document.getElementById('c-30').textContent = r.dias30;
       document.getElementById('c-receita').textContent = euro(r.receita30);
       document.getElementById('c-lucro').textContent = euro(r.lucro30);
       document.getElementById('c-encomendar').textContent = r.porEncomendar;
-      // O nº mais importante: destaca a roxo se houver trabalho pendente
       if (r.porEncomendar > 0) document.getElementById('c-card-encomendar').classList.add('urgente');
 
       document.getElementById('t-ultimas').innerHTML = r.ultimas.length
         ? r.ultimas.map(linhaEncomenda).join('')
         : '<tr><td colspan="6" class="adm-vazio">Ainda sem encomendas.</td></tr>';
-    })();
+
+      renderGrafico(r.grafico7dias);
+
+      const nova = r.ultimas[0]?.numero_encomenda || null;
+      if (!primeiro && nova && nova !== ultimaEncomenda) {
+        tocarNotificacao();
+        mostrarToast(`🛒 Nova encomenda: ${nova}`);
+      }
+      ultimaEncomenda = nova;
+    }
+
+    atualizarResumo(true);
+    setInterval(() => atualizarResumo(false), 30000);
 
     // Backups
     async function carregarBackups() {
