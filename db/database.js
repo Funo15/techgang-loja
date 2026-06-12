@@ -16,6 +16,9 @@ db.pragma('journal_mode = WAL');
 const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
 db.exec(schema);
 
+// Migrações incrementais (colunas adicionadas após o schema inicial)
+try { db.exec(`ALTER TABLE orders ADD COLUMN teste INTEGER NOT NULL DEFAULT 0`); } catch {};
+
 // ------------------------------------------------------------
 // SEED — só corre se a tabela de produtos estiver vazia.
 // Custos do fornecedor reais-fictícios com margem de 3-4x.

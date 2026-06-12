@@ -75,6 +75,7 @@ function filtrarEncomendas(query) {
   const params = [];
   if (query.estado_pagamento) { condicoes.push('estado_pagamento = ?'); params.push(query.estado_pagamento); }
   if (query.estado_fulfillment) { condicoes.push('estado_fulfillment = ?'); params.push(query.estado_fulfillment); }
+  if (query.esconder_testes === '1') { condicoes.push('teste = 0'); }
   if (query.q) {
     condicoes.push('(nome_cliente LIKE ? OR email LIKE ? OR numero_encomenda LIKE ?)');
     const termo = `%${query.q}%`;
@@ -185,6 +186,14 @@ router.post('/encomendas/:numero/notas', (req, res) => {
     .run(notas, req.params.numero);
   if (r.changes === 0) return res.status(404).json({ erro: 'Encomenda não encontrada' });
   res.json({ ok: true });
+});
+
+router.post('/encomendas/:numero/teste', (req, res) => {
+  const o = db.prepare('SELECT teste FROM orders WHERE numero_encomenda = ?').get(req.params.numero);
+  if (!o) return res.status(404).json({ erro: 'Encomenda não encontrada' });
+  const novoValor = o.teste ? 0 : 1;
+  db.prepare('UPDATE orders SET teste = ? WHERE numero_encomenda = ?').run(novoValor, req.params.numero);
+  res.json({ ok: true, teste: novoValor });
 });
 
 // ------------------------------------------------------------

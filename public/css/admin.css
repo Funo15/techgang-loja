@@ -193,6 +193,8 @@ textarea { resize: vertical; }
 /* ---------- Filtros ---------- */
 .adm-filtros { display: grid; grid-template-columns: 1fr; gap: 0.6rem; margin-bottom: 1rem; }
 .adm-filtros input[type="search"] { min-width: 0; }
+.adm-check-label { display: flex; align-items: center; gap: .4rem; font-size: .85rem; color: var(--cor-texto-suave); cursor: pointer; }
+.adm-notas-acoes { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .5rem; }
 
 /* ---------- Tabelas ---------- */
 .adm-tabela-wrap {
@@ -236,6 +238,8 @@ textarea { resize: vertical; }
 .badge-paga { background: #E3F4E8; color: #1F7A45; }
 .badge-reembolsada { background: #F3E3E1; color: #A03A30; }
 .badge-cancelada { background: #ECEBF1; color: #6B6877; }
+.badge-teste { background: #F0F0F0; color: #888; }
+.adm-linha-teste td { opacity: .55; }
 .badge-por_encomendar { background: color-mix(in srgb, var(--cor-acento) 12%, #fff); color: var(--cor-acento); }
 .badge-encomendada_fornecedor { background: #E0EDF9; color: #1D5B8F; }
 .badge-enviada { background: #E8E4FA; color: #4D36A8; }
@@ -351,7 +355,7 @@ textarea { resize: vertical; }
 /* ---------- Desktop ---------- */
 @media (min-width: 720px) {
   .adm-cards { grid-template-columns: repeat(3, 1fr); }
-  .adm-filtros { grid-template-columns: 1.4fr 1fr 1fr; }
+  .adm-filtros { grid-template-columns: 1.4fr 1fr 1fr auto; align-items: center; }
   .adm-detalhe { grid-template-columns: 1.5fr 1fr; align-items: start; }
   .campo-linha-3 { grid-template-columns: repeat(3, 1fr); }
 }

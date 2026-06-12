@@ -83,8 +83,8 @@
 
   // Linha de tabela de encomenda (dashboard e listagem usam a mesma)
   function linhaEncomenda(o) {
-    return `<tr>
-      <td><a href="/admin/encomendas/${o.numero_encomenda}">${o.numero_encomenda}</a></td>
+    return `<tr${o.teste ? ' class="adm-linha-teste"' : ''}>
+      <td><a href="/admin/encomendas/${o.numero_encomenda}">${o.numero_encomenda}</a>${o.teste ? ' <span class="badge badge-teste">Teste</span>' : ''}</td>
       <td>${esc(o.nome_cliente)}</td>
       <td class="num">${euro(o.total)}</td>
       <td>${badge(o.estado_pagamento)}</td>
@@ -162,6 +162,7 @@
     const pesquisa = document.getElementById('f-pesquisa');
     const fPag = document.getElementById('f-pagamento');
     const fFul = document.getElementById('f-fulfillment');
+    const fTeste = document.getElementById('f-esconder-testes');
 
     // Filtros pré-preenchidos via URL (ex: vindos do card do dashboard)
     const params = new URLSearchParams(location.search);
@@ -173,6 +174,7 @@
       if (pesquisa.value.trim()) q.set('q', pesquisa.value.trim());
       if (fPag.value) q.set('estado_pagamento', fPag.value);
       if (fFul.value) q.set('estado_fulfillment', fFul.value);
+      if (fTeste.checked) q.set('esconder_testes', '1');
       return q.toString();
     }
 
@@ -189,6 +191,7 @@
     pesquisa.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(carregar, 300); });
     fPag.addEventListener('change', carregar);
     fFul.addEventListener('change', carregar);
+    fTeste.addEventListener('change', carregar);
     carregar();
   }
 
@@ -297,6 +300,14 @@
       const ok = document.getElementById('notas-ok');
       ok.hidden = false;
       setTimeout(() => { ok.hidden = true; }, 2000);
+    });
+
+    document.getElementById('btn-teste').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-teste');
+      const { teste } = await api(`/api/admin/encomendas/${encodeURIComponent(numero)}/teste`, { method: 'POST' });
+      btn.textContent = teste ? 'Remover marcação de teste' : 'Marcar como teste';
+      document.getElementById('e-badges').querySelectorAll('.badge-teste').forEach(el => el.remove());
+      if (teste) document.getElementById('e-badges').insertAdjacentHTML('beforeend', '<span class="badge badge-teste">Teste</span>');
     });
   }
 

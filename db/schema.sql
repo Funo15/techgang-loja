@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS orders (
   tracking_number TEXT,
   tracking_url TEXT,
   notas_internas TEXT NOT NULL DEFAULT '',
+  teste INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
