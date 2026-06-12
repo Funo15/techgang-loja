@@ -266,7 +266,7 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
 .seccao-banner { padding-top: 0.8rem; }
 .banner {
   position: relative;
-  background: var(--cor-acento);
+  background: linear-gradient(135deg, var(--cor-acento) 0%, color-mix(in srgb, var(--cor-acento) 70%, #18103a) 100%);
   color: var(--cor-acento-texto);
   border-radius: 20px;
   overflow: hidden;
@@ -286,30 +286,82 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
 }
 .banner::before { width: 220px; height: 220px; left: -70px; bottom: -90px; }
 .banner::after { width: 150px; height: 150px; left: 38%; top: -60px; }
-.banner-texto { padding: 1.6rem 0 1.6rem 1.4rem; }
-.banner-texto h1 { font-size: clamp(1.5rem, 6vw, 2.6rem); margin-bottom: 0.5rem; }
+.banner-texto { padding: 2rem 0 2rem 1.4rem; }
+.banner-chip {
+  display: inline-block;
+  background: color-mix(in srgb, var(--cor-acento-texto) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cor-acento-texto) 25%, transparent);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 0.9rem;
+}
+.banner-texto h1 { font-size: clamp(1.7rem, 6vw, 3rem); margin-bottom: 0.5rem; line-height: 1.12; }
 .banner-texto p {
-  color: color-mix(in srgb, var(--cor-acento-texto) 82%, var(--cor-acento));
-  font-size: 0.92rem;
-  max-width: 30ch;
-  margin-bottom: 1.1rem;
+  color: color-mix(in srgb, var(--cor-acento-texto) 85%, var(--cor-acento));
+  font-size: 1rem;
+  max-width: 34ch;
+  margin-bottom: 1.2rem;
 }
-.banner-media { height: 100%; min-height: 230px; }
-.banner-media img {
-  width: 100%;
-  height: 115%;
-  object-fit: cover;
-  /* Funde a imagem no roxo do banner (coesão de marca) */
-  mix-blend-mode: luminosity;
-  opacity: 0.9;
+.banner-acoes { display: flex; gap: 0.7rem; flex-wrap: wrap; }
+.btn-banner-fantasma {
+  background: transparent;
+  color: var(--cor-acento-texto);
+  border: 1.5px solid color-mix(in srgb, var(--cor-acento-texto) 45%, transparent);
 }
-/* Véu roxo na junção texto/imagem para a transição ser suave */
-.banner-media::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to right, var(--cor-acento) 0%, transparent 45%);
-  pointer-events: none;
+.btn-banner-fantasma:hover { border-color: var(--cor-acento-texto); background: color-mix(in srgb, var(--cor-acento-texto) 10%, transparent); }
+.banner-confianca {
+  list-style: none;
+  display: flex;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+  margin: 1.3rem 0 0;
+  padding: 0;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--cor-acento-texto) 80%, var(--cor-acento));
+}
+.banner-confianca li { display: flex; align-items: center; gap: 0.35rem; }
+.banner-confianca li::before { content: '✓'; font-weight: 800; color: var(--cor-acento-texto); }
+.banner-media {
+  height: 100%;
+  min-height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.banner-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1.5rem;
+  transform: rotate(-4deg);
+}
+.banner-tile {
+  width: 86px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+  font-size: 2.2rem;
+  background: color-mix(in srgb, var(--cor-acento-texto) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cor-acento-texto) 22%, transparent);
+  border-radius: 22px;
+  backdrop-filter: blur(4px);
+  animation: tile-flutua 5s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.banner-tile:nth-child(even) { transform: translateY(14px); }
+@keyframes tile-flutua {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .banner-tile { animation: none; }
+}
+@media (max-width: 640px) {
+  .banner-tile { width: 58px; height: 58px; font-size: 1.5rem; border-radius: 16px; }
+  .banner-tiles { gap: 0.7rem; padding: 1rem 0.6rem; }
+  .banner-confianca { gap: 0.7rem; font-size: 0.74rem; }
 }
 
 /* ---------- Categorias (pills) ---------- */
