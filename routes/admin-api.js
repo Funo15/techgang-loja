@@ -13,6 +13,8 @@ const db = require('../db/database');
 const config = require('../config');
 const { enviarEmailTracking } = require('../lib/email');
 const { registarTracking } = require('../lib/track17');
+const { encomendaPaga, estadoAlterado, backupConcluido } = require('../lib/logger');
+const { fazerBackup, limparBackupsAntigos } = require('../lib/backup');
 
 const router = express.Router();
 
@@ -146,6 +148,7 @@ router.post('/encomendas/:numero/fulfillment', (req, res) => {
       UPDATE orders SET estado_fulfillment = 'encomendada_fornecedor', fornecedor_order_id = ?
       WHERE numero_encomenda = ?
     `).run(String(fornecedor_order_id || '').slice(0, 80) || null, o.numero_encomenda);
+    estadoAlterado(o.numero_encomenda, 'fulfillment', 'encomendada_fornecedor');
 
   } else if (acao === 'enviada') {
     const numTracking = String(tracking_number || '').trim().slice(0, 80);
@@ -158,6 +161,7 @@ router.post('/encomendas/:numero/fulfillment', (req, res) => {
       UPDATE orders SET estado_fulfillment = 'enviada', tracking_number = ?, tracking_url = ?
       WHERE numero_encomenda = ?
     `).run(numTracking, urlTracking || null, o.numero_encomenda);
+    estadoAlterado(o.numero_encomenda, 'fulfillment', 'enviada');
     // Email ao cliente com o link de tracking (não bloqueia a resposta)
     const atualizada = db.prepare('SELECT * FROM orders WHERE numero_encomenda = ?').get(o.numero_encomenda);
     enviarEmailTracking(atualizada).catch(err => console.error(`[admin] email tracking: ${err.message}`));
@@ -165,6 +169,7 @@ router.post('/encomendas/:numero/fulfillment', (req, res) => {
 
   } else if (acao === 'entregue') {
     db.prepare(`UPDATE orders SET estado_fulfillment = 'entregue' WHERE numero_encomenda = ?`).run(o.numero_encomenda);
+    estadoAlterado(o.numero_encomenda, 'fulfillment', 'entregue');
 
   } else {
     return res.status(400).json({ erro: 'Ação inválida.' });
@@ -331,6 +336,38 @@ router.post('/upload', upload.array('imagens', 6), async (req, res) => {
   }
   if (!urls.length) return res.status(400).json({ erro: 'Não foi possível processar as imagens.' });
   res.json({ urls });
+});
+
+// ------------------------------------------------------------
+// BACKUPS — forçar backup manual + listagem
+// ------------------------------------------------------------
+router.post('/backup', async (req, res) => {
+  try {
+    const { nome } = await fazerBackup();
+    limparBackupsAntigos();
+    backupConcluido(nome);
+    res.json({ ok: true, nome });
+  } catch (err) {
+    console.error(`[admin] backup manual falhou: ${err.message}`);
+    res.status(500).json({ erro: 'Backup falhou. Verifica os logs.' });
+  }
+});
+
+router.get('/backups', (req, res) => {
+  const PATHS = require('../lib/paths');
+  const fs = require('fs');
+  try {
+    const ficheiros = fs.readdirSync(PATHS.backups)
+      .filter(f => f.startsWith('loja-') && f.endsWith('.db'))
+      .map(f => {
+        const stat = fs.statSync(require('path').join(PATHS.backups, f));
+        return { nome: f, tamanho: stat.size, data: stat.mtime.toISOString() };
+      })
+      .sort((a, b) => b.data.localeCompare(a.data));
+    res.json(ficheiros);
+  } catch {
+    res.json([]);
+  }
 });
 
 module.exports = router;

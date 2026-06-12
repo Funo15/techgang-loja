@@ -11,6 +11,7 @@
 const express = require('express');
 const db = require('../db/database');
 const config = require('../config');
+const { encomendaCriada } = require('../lib/logger');
 
 const router = express.Router();
 
@@ -102,6 +103,8 @@ router.post('/checkout', async (req, res) => {
     cliente.morada.trim(), cliente.codigo_postal, cliente.cidade.trim(),
     cliente.pais.trim(), JSON.stringify(itemsValidados), subtotal, portes, total
   );
+
+  encomendaCriada(numero, total);
 
   // 5) Sem Stripe configurado: modo dev — segue para /obrigado na mesma
   if (!stripe) {

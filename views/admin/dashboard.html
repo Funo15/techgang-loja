@@ -50,6 +50,16 @@
       <tbody id="t-ultimas"><tr><td colspan="6" class="adm-vazio">A carregar…</td></tr></tbody>
     </table>
   </div>
+
+  <h2>Base de dados</h2>
+  <div class="adm-backup-area">
+    <p class="adm-backup-nota">Backup automático diário às 03:00 para <code>/backups/</code>. Retém os últimos 14 dias.</p>
+    <div class="adm-backup-acoes">
+      <button id="btn-backup" class="adm-btn adm-btn-secundario">Fazer backup agora</button>
+      <span id="backup-estado"></span>
+    </div>
+    <ul id="lista-backups" class="adm-backup-lista"></ul>
+  </div>
 </main>
 <script src="/js/admin.js"></script>
 </body>

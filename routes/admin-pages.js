@@ -11,6 +11,7 @@ const fs = require('fs');
 const config = require('../config');
 const { passwordCorreta, criarCookie, limparCookie, sessaoValida, exigirAdmin } = require('../lib/admin-auth');
 const { limitadorAuth, delayAdmin, registarFalhaAdmin, limparFalhasAdmin } = require('../lib/seguranca');
+const { loginFalhou } = require('../lib/logger');
 
 const router = express.Router();
 const VIEWS = path.join(__dirname, '..', 'views');
@@ -48,6 +49,7 @@ router.post('/login', limitadorAuth, delayAdmin, (req, res) => {
   }
   if (!passwordCorreta(req.body?.password)) {
     registarFalhaAdmin(req.ip || '');
+    loginFalhou(req.ip || '', 'admin');
     return res.status(401).json({ erro: 'Password errada.' });
   }
   limparFalhasAdmin(req.ip || '');

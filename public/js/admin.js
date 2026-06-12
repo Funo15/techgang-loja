@@ -121,6 +121,38 @@
         ? r.ultimas.map(linhaEncomenda).join('')
         : '<tr><td colspan="6" class="adm-vazio">Ainda sem encomendas.</td></tr>';
     })();
+
+    // Backups
+    async function carregarBackups() {
+      const lista = document.getElementById('lista-backups');
+      try {
+        const bs = await api('/api/admin/backups');
+        lista.innerHTML = bs.length
+          ? bs.map(b => {
+              const mb = (b.tamanho / 1024 / 1024).toFixed(2);
+              const data = new Date(b.data).toLocaleString('pt-PT', { timeZone: 'Europe/Lisbon' });
+              return `<li><code>${b.nome}</code> <small>${mb} MB — ${data}</small></li>`;
+            }).join('')
+          : '<li class="adm-vazio">Nenhum backup ainda.</li>';
+      } catch { lista.innerHTML = '<li class="adm-vazio">Não foi possível carregar.</li>'; }
+    }
+    carregarBackups();
+
+    document.getElementById('btn-backup').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-backup');
+      const estado = document.getElementById('backup-estado');
+      btn.disabled = true;
+      estado.textContent = 'A fazer backup…';
+      try {
+        const r = await api('/api/admin/backup', { method: 'POST' });
+        estado.textContent = `✓ ${r.nome}`;
+        carregarBackups();
+      } catch (err) {
+        estado.textContent = `Erro: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+      }
+    });
   }
 
   // ============================================================

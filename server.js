@@ -10,6 +10,18 @@ const path = require('path');
 const config = require('./config');
 const { limitadorGeral, helmetConfig } = require('./lib/seguranca');
 const PATHS = require('./lib/paths');
+const { erro500 } = require('./lib/logger');
+const { agendarBackupDiario } = require('./lib/backup');
+
+// Handlers globais — logar e sair limpo em vez de ficar num estado indefinido
+process.on('uncaughtException', (err) => {
+  console.error('[fatal] uncaughtException:', err.message, err.stack);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[fatal] unhandledRejection:', reason);
+  process.exit(1);
+});
 
 // Inicializa a BD (cria schema + seed na primeira execução)
 require('./db/database');
@@ -59,14 +71,36 @@ app.use('/api/admin', exigirAdmin, require('./routes/admin-api'));
 app.use('/admin', require('./routes/admin-pages'));
 app.use('/', require('./routes/pages'));
 
+// Health check — para monitorização externa (Railway, UptimeRobot, etc.)
+app.get('/health', (req, res) => res.json({ ok: true }));
+
 // 404 simples para rotas desconhecidas
 app.use((req, res) => {
   if (req.path.startsWith('/api')) return res.status(404).json({ erro: 'Rota não encontrada' });
   res.status(404).send(`<p style="font-family:sans-serif;padding:2rem">Página não encontrada. <a href="/">Voltar à ${config.nome}</a></p>`);
 });
 
+// Handler de erros 500 — nunca expõe stack traces em produção
+app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
+  erro500(req, err);
+  console.error('[500]', err.message);
+  if (req.path.startsWith('/api')) {
+    return res.status(500).json({ erro: 'Erro interno. Tenta novamente.' });
+  }
+  res.status(500).send(`
+    <!doctype html><html lang="pt"><head><meta charset="utf-8">
+    <title>Erro — ${config.nome}</title>
+    <style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f5f5f5}
+    .box{text-align:center;padding:2rem;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+    h1{color:#6C4BE0;margin-bottom:.5rem}a{color:#6C4BE0}</style></head>
+    <body><div class="box"><h1>Ups, algo correu mal</h1>
+    <p>Estamos a trabalhar para resolver. <a href="/">Voltar à loja</a></p></div></body></html>
+  `);
+});
+
 const porta = process.env.PORT || config.porta;
 const host = process.env.PORT ? '0.0.0.0' : '127.0.0.1'; // Railway usa 0.0.0.0
 app.listen(porta, host, () => {
   console.log(`${config.nome} a correr em http://localhost:${porta}`);
+  agendarBackupDiario();
 });

@@ -11,6 +11,7 @@
 const db = require('../db/database');
 const { enviarEmailsEncomenda } = require('../lib/email');
 const { criarOrdemCJ } = require('../lib/cj');
+const { webhookInvalido, encomendaPaga } = require('../lib/logger');
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? require('stripe')(process.env.STRIPE_SECRET_KEY)
@@ -31,6 +32,7 @@ function webhookStripe(req, res) {
     );
   } catch (err) {
     console.error(`[webhook] assinatura inválida: ${err.message}`);
+    webhookInvalido(req.ip, err.message);
     return res.status(400).json({ erro: 'Assinatura inválida' });
   }
 
@@ -50,6 +52,7 @@ function webhookStripe(req, res) {
 
     if (resultado.changes === 1) {
       console.log(`[webhook] encomenda ${numero} marcada como paga (${metodo})`);
+      encomendaPaga(numero, metodo);
       // Emails em background — a resposta ao Stripe não espera por eles
       const order = db.prepare('SELECT * FROM orders WHERE numero_encomenda = ?').get(numero);
       enviarEmailsEncomenda(order).catch(err =>
