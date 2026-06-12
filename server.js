@@ -9,6 +9,7 @@ const express = require('express');
 const path = require('path');
 const config = require('./config');
 const { limitadorGeral, helmetConfig } = require('./lib/seguranca');
+const PATHS = require('./lib/paths');
 
 // Inicializa a BD (cria schema + seed na primeira execução)
 require('./db/database');
@@ -33,6 +34,8 @@ app.use('/api', limitadorGeral);
 
 // Ficheiros estáticos (css, js, imagens)
 app.use(express.static(path.join(__dirname, 'public')));
+// Imagens de produtos — servidas do volume persistente
+app.use('/media', express.static(PATHS.uploads));
 
 // Rotas
 app.use('/img', require('./routes/placeholders'));

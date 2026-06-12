@@ -6,3 +6,4 @@ db/loja.db-wal
 db/loja.db.bak
 .DS_Store
 public/uploads/
+local-data/

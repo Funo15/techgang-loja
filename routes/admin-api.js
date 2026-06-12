@@ -302,8 +302,8 @@ router.patch('/produtos/:id/toggle', (req, res) => {
 // ------------------------------------------------------------
 // UPLOAD DE IMAGENS — multer (memória) + sharp (máx 1200px, q80)
 // ------------------------------------------------------------
-const PASTA_UPLOADS = path.join(__dirname, '..', 'public', 'uploads', 'produtos');
-fs.mkdirSync(PASTA_UPLOADS, { recursive: true });
+const PATHS = require('../lib/paths');
+const PASTA_UPLOADS = PATHS.uploads;
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -324,7 +324,7 @@ router.post('/upload', upload.array('imagens', 6), async (req, res) => {
         .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
         .webp({ quality: 80 })
         .toFile(path.join(PASTA_UPLOADS, nome));
-      urls.push(`/uploads/produtos/${nome}`);
+      urls.push(`/media/${nome}`);
     } catch (err) {
       console.error(`[admin] upload falhou: ${err.message}`);
     }

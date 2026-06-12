@@ -7,8 +7,9 @@
 const path = require('path');
 const fs = require('fs');
 const Database = require('better-sqlite3');
+const PATHS = require('../lib/paths');
 
-const db = new Database(path.join(__dirname, 'loja.db'));
+const db = new Database(PATHS.db);
 db.pragma('journal_mode = WAL');
 
 // Aplica o schema (idempotente: usa IF NOT EXISTS)
