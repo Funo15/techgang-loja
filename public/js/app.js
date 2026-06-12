@@ -695,6 +695,7 @@
     function mostrarErros(erros) {
       form.querySelectorAll('.erro-campo').forEach(el => { el.hidden = true; });
       form.querySelectorAll('input').forEach(el => el.classList.remove('invalido'));
+      document.getElementById('checkout-erro-geral').hidden = true;
       let primeiro = null;
       for (const [campo, msg] of Object.entries(erros)) {
         const aviso = form.querySelector(`[data-erro="${campo}"]`);

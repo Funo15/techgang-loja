@@ -155,7 +155,7 @@ router.post('/checkout', async (req, res) => {
     }
     res.json({ url: session.url });
   } catch (err) {
-    console.error(`[checkout] erro Stripe na encomenda ${numero}: ${err.message}`);
+    console.error(`[checkout] erro Stripe na encomenda ${numero}: [${err.type}] ${err.message}`);
     res.status(502).json({ erro: 'Não foi possível iniciar o pagamento. Tenta novamente.' });
   }
 });
