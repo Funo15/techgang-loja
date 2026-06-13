@@ -107,7 +107,7 @@ router.get('/setup-2fa', async (req, res) => {
     TITULO: `Setup 2FA | Admin ${config.nome}`,
     TOTP_SECRET: segredo,
     QR_DATA_URL: qr,
-    TOTP_ATIVO: totpAtivo() ? '1' : ''
+    ALERTA_TOTP: totpAtivo() ? '<div class="adm-alerta adm-alerta-ok">O 2FA já está ativo. Para reconfigurar, gera um novo segredo abaixo e adiciona-o ao Railway.</div>' : ''
   }));
 });
 

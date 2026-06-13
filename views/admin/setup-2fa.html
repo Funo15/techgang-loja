@@ -11,11 +11,7 @@
   </div>
 
   <div class="adm-setup-2fa">
-    {{#IF_TOTP_ATIVO}}
-    <div class="adm-alerta adm-alerta-ok">
-      O 2FA já está ativo. Para reconfigurar, gera um novo segredo abaixo e adiciona-o ao Railway.
-    </div>
-    {{/IF_TOTP_ATIVO}}
+    {{ALERTA_TOTP}}
 
     <div class="adm-setup-passos">
       <div class="adm-setup-passo">
