@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:admin-head}}
+</head>
+<body data-adm-page="setup-2fa">
+{{include:admin-nav}}
+<main class="adm-main">
+  <div class="adm-cabeca">
+    <h1>Configurar 2FA</h1>
+  </div>
+
+  <div class="adm-setup-2fa">
+    {{#IF_TOTP_ATIVO}}
+    <div class="adm-alerta adm-alerta-ok">
+      O 2FA já está ativo. Para reconfigurar, gera um novo segredo abaixo e adiciona-o ao Railway.
+    </div>
+    {{/IF_TOTP_ATIVO}}
+
+    <div class="adm-setup-passos">
+      <div class="adm-setup-passo">
+        <span class="adm-setup-num">1</span>
+        <div>
+          <strong>Instala o Google Authenticator</strong>
+          <p>Disponível na App Store e Google Play.</p>
+        </div>
+      </div>
+      <div class="adm-setup-passo">
+        <span class="adm-setup-num">2</span>
+        <div>
+          <strong>Lê o QR code abaixo</strong>
+          <div class="adm-qr-wrap">
+            <img src="{{QR_DATA_URL}}" alt="QR code 2FA" width="200" height="200">
+          </div>
+          <p class="adm-setup-ou">Ou insere manualmente o segredo:</p>
+          <code class="adm-totp-secret">{{TOTP_SECRET}}</code>
+        </div>
+      </div>
+      <div class="adm-setup-passo">
+        <span class="adm-setup-num">3</span>
+        <div>
+          <strong>Adiciona esta variável no Railway</strong>
+          <code class="adm-totp-secret">ADMIN_TOTP_SECRET = {{TOTP_SECRET}}</code>
+          <p>Após o deploy, o login vai pedir o código de 6 dígitos depois da password.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

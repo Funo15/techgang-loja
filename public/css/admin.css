@@ -399,3 +399,16 @@ textarea { resize: vertical; }
 @media (min-width: 1000px) {
   .adm-cards { grid-template-columns: repeat(7, 1fr); }
 }
+
+/* ---------- 2FA Setup ---------- */
+.adm-totp-hint { font-size: .82rem; color: var(--cor-texto-suave); margin-top: .5rem; }
+.adm-setup-2fa { max-width: 560px; }
+.adm-setup-passos { display: flex; flex-direction: column; gap: 1.5rem; }
+.adm-setup-passo { display: flex; gap: 1rem; align-items: flex-start; }
+.adm-setup-num { width: 28px; height: 28px; border-radius: 50%; background: var(--cor-acento); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; flex-shrink: 0; margin-top: .1rem; }
+.adm-setup-passo p { font-size: .85rem; color: var(--cor-texto-suave); margin: .3rem 0 0; }
+.adm-qr-wrap { margin: .8rem 0; background: #fff; display: inline-block; padding: .5rem; border-radius: 8px; }
+.adm-setup-ou { margin: .6rem 0 .3rem !important; }
+.adm-totp-secret { display: block; font-family: var(--fonte-mono); font-size: .85rem; background: var(--cor-fundo); border: 1px solid var(--cor-linha); padding: .5rem .8rem; border-radius: 8px; word-break: break-all; margin-top: .4rem; }
+.adm-alerta { padding: .9rem 1.1rem; border-radius: 10px; font-size: .88rem; margin-bottom: 1.5rem; }
+.adm-alerta-ok { background: #e6f4ea; color: #1e6b3a; border: 1px solid #b7dfbf; }

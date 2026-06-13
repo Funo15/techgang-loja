@@ -7,12 +7,80 @@
 <main class="adm-login">
   <form class="adm-login-cartao" id="form-login">
     <p class="adm-logo">Tech<span>Gang</span> <em>admin</em></p>
-    <label for="l-pass">Password</label>
-    <input id="l-pass" name="password" type="password" autocomplete="current-password" autofocus required>
+
+    <div id="passo-password">
+      <label for="l-pass">Password</label>
+      <input id="l-pass" name="password" type="password" autocomplete="current-password" autofocus required>
+    </div>
+
+    <div id="passo-totp" hidden>
+      <label for="l-totp">Código de autenticação (6 dígitos)</label>
+      <input id="l-totp" name="codigo" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="000000">
+      <p class="adm-totp-hint">Abre o Google Authenticator e insere o código para <strong>{{NOME}}</strong>.</p>
+    </div>
+
     <p class="adm-erro" id="login-erro" hidden></p>
-    <button type="submit" class="adm-btn adm-btn-primario">Entrar</button>
+    <button type="submit" class="adm-btn adm-btn-primario" id="btn-entrar">Entrar</button>
   </form>
 </main>
-<script src="/js/admin.js"></script>
+<script>
+(function() {
+  const form = document.getElementById('form-login');
+  const erro = document.getElementById('login-erro');
+  const btn  = document.getElementById('btn-entrar');
+  const passoPass = document.getElementById('passo-password');
+  const passoTotp = document.getElementById('passo-totp');
+  let emTotp = false;
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    erro.hidden = true;
+    btn.disabled = true;
+    btn.textContent = 'A verificar…';
+
+    try {
+      let r, d;
+      if (!emTotp) {
+        r = await fetch('/funitocorp/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: document.getElementById('l-pass').value })
+        });
+        d = await r.json();
+        if (d.totp) {
+          emTotp = true;
+          passoPass.hidden = true;
+          passoTotp.hidden = false;
+          document.getElementById('l-totp').focus();
+          btn.disabled = false;
+          btn.textContent = 'Verificar código';
+          return;
+        }
+      } else {
+        r = await fetch('/funitocorp/login/totp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo: document.getElementById('l-totp').value })
+        });
+        d = await r.json();
+      }
+
+      if (!r.ok) {
+        erro.textContent = d.erro || 'Erro desconhecido.';
+        erro.hidden = false;
+        btn.disabled = false;
+        btn.textContent = emTotp ? 'Verificar código' : 'Entrar';
+        return;
+      }
+      location.href = '/funitocorp';
+    } catch {
+      erro.textContent = 'Erro de ligação.';
+      erro.hidden = false;
+      btn.disabled = false;
+      btn.textContent = emTotp ? 'Verificar código' : 'Entrar';
+    }
+  });
+})();
+</script>
 </body>
 </html>

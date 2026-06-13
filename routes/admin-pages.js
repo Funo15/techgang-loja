@@ -1,22 +1,25 @@
 // ============================================================
-// PÁGINAS DO ADMIN (/admin/*)
-// /admin/login é a única página pública; todas as outras
+// PÁGINAS DO ADMIN (/funitocorp/*)
+// /funitocorp/login é a única página pública; todas as outras
 // passam pelo middleware exigirAdmin (cookie assinado).
-// Reutiliza o mini-renderer de pages.js via require.
+// 2FA TOTP opcional — ativar com ADMIN_TOTP_SECRET no .env.
 // ============================================================
 
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const config = require('../config');
-const { passwordCorreta, criarCookie, limparCookie, sessaoValida, exigirAdmin } = require('../lib/admin-auth');
+const {
+  passwordCorreta, criarCookie, limparCookie, sessaoValida, exigirAdmin,
+  totpAtivo, verificarTotp, gerarSegredoTotp,
+  criarCookiePreAuth, limparCookiePreAuth, preAuthValida
+} = require('../lib/admin-auth');
 const { limitadorAuth, delayAdmin, registarFalhaAdmin, limparFalhasAdmin } = require('../lib/seguranca');
 const { loginFalhou } = require('../lib/logger');
 
 const router = express.Router();
 const VIEWS = path.join(__dirname, '..', 'views');
 
-// Renderer próprio (igual ao de pages.js, mas para views/admin/*)
 function render(nomeView, extra = {}) {
   let html = fs.readFileSync(path.join(VIEWS, 'admin', `${nomeView}.html`), 'utf8');
   html = html.replace(/\{\{include:([a-z0-9-]+)\}\}/g, (_, nome) =>
@@ -37,9 +40,10 @@ function render(nomeView, extra = {}) {
   return html.replace(/\{\{([A-Z_]+)\}\}/g, (m, chave) => tokens[chave] ?? m);
 }
 
-// --- Login (público) ---
+// ── Login ────────────────────────────────────────────────────
+
 router.get('/login', (req, res) => {
-  if (sessaoValida(req)) return res.redirect('/admin');
+  if (sessaoValida(req)) return res.redirect('/funitocorp');
   res.send(render('login', { TITULO: `Admin | ${config.nome}` }));
 });
 
@@ -53,6 +57,25 @@ router.post('/login', limitadorAuth, delayAdmin, (req, res) => {
     return res.status(401).json({ erro: 'Password errada.' });
   }
   limparFalhasAdmin(req.ip || '');
+  if (totpAtivo()) {
+    criarCookiePreAuth(res);
+    return res.json({ totp: true });
+  }
+  criarCookie(res);
+  res.json({ ok: true });
+});
+
+router.post('/login/totp', limitadorAuth, (req, res) => {
+  if (!preAuthValida(req)) {
+    return res.status(401).json({ erro: 'Sessão expirada. Volta a entrar com a password.' });
+  }
+  const codigo = String(req.body?.codigo || '').replace(/\s/g, '');
+  if (!verificarTotp(codigo)) {
+    registarFalhaAdmin(req.ip || '');
+    return res.status(401).json({ erro: 'Código incorreto. Tenta novamente.' });
+  }
+  limparCookiePreAuth(res);
+  limparFalhasAdmin(req.ip || '');
   criarCookie(res);
   res.json({ ok: true });
 });
@@ -62,8 +85,10 @@ router.post('/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-// --- Páginas protegidas ---
+// ── Páginas protegidas ───────────────────────────────────────
+
 router.use(exigirAdmin);
+
 router.get('/', (req, res) => res.send(render('dashboard', { TITULO: `Admin | ${config.nome}` })));
 router.get('/encomendas', (req, res) => res.send(render('encomendas', { TITULO: `Encomendas | Admin ${config.nome}` })));
 router.get('/encomendas/:numero', (req, res) => res.send(render('encomenda', { TITULO: `${req.params.numero} | Admin ${config.nome}` })));
@@ -71,5 +96,20 @@ router.get('/produtos', (req, res) => res.send(render('produtos', { TITULO: `Pro
 router.get('/produtos/novo', (req, res) => res.send(render('produto-form', { TITULO: `Novo produto | Admin ${config.nome}` })));
 router.get('/produtos/:id', (req, res) => res.send(render('produto-form', { TITULO: `Editar produto | Admin ${config.nome}` })));
 router.get('/clientes', (req, res) => res.send(render('clientes', { TITULO: `Clientes | Admin ${config.nome}` })));
+
+// Setup 2FA — mostra QR code para configurar Google Authenticator
+router.get('/setup-2fa', async (req, res) => {
+  const { authenticator } = require('otplib');
+  const QRCode = require('qrcode');
+  const segredo = gerarSegredoTotp();
+  const otpauth = authenticator.keyuri('admin', config.nome, segredo);
+  const qr = await QRCode.toDataURL(otpauth);
+  res.send(render('setup-2fa', {
+    TITULO: `Setup 2FA | Admin ${config.nome}`,
+    TOTP_SECRET: segredo,
+    QR_DATA_URL: qr,
+    TOTP_ATIVO: totpAtivo() ? '1' : ''
+  }));
+});
 
 module.exports = router;

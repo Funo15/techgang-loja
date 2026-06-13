@@ -69,7 +69,7 @@ app.use('/api/conta', require('./routes/conta'));
 const { exigirAdmin } = require('./lib/admin-auth');
 app.get('/api/admin/live', exigirAdmin, (req, res) => visitantes.subscrever(res));
 app.use('/api/admin', exigirAdmin, require('./routes/admin-api'));
-app.use('/admin', require('./routes/admin-pages'));
+app.use('/funitocorp', require('./routes/admin-pages'));
 app.use('/', require('./routes/pages'));
 
 // Health check — para monitorização externa (Railway, UptimeRobot, etc.)

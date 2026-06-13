@@ -35,7 +35,7 @@
     }
     const res = await fetch(url, opcoes);
     if (res.status === 401) {
-      location.href = '/admin/login';
+      location.href = '/funitocorp/login';
       throw new Error('sessão expirada');
     }
     const dados = await res.json().catch(() => ({}));
@@ -52,8 +52,8 @@
     a.classList.toggle('ativo', ativo);
   });
   document.getElementById('adm-logout')?.addEventListener('click', async () => {
-    await fetch('/admin/logout', { method: 'POST' });
-    location.href = '/admin/login';
+    await fetch('/funitocorp/logout', { method: 'POST' });
+    location.href = '/funitocorp/login';
   });
 
   // ============================================================
@@ -66,14 +66,14 @@
       const erro = document.getElementById('login-erro');
       erro.hidden = true;
       try {
-        const res = await fetch('/admin/login', {
+        const res = await fetch('/funitocorp/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password: document.getElementById('l-pass').value })
         });
         const dados = await res.json();
         if (!res.ok) throw new Error(dados.erro || 'Erro');
-        location.href = '/admin';
+        location.href = '/funitocorp';
       } catch (err) {
         erro.textContent = err.message;
         erro.hidden = false;
@@ -85,7 +85,7 @@
   function linhaEncomenda(o, comControlos = false) {
     return `<tr${o.teste ? ' class="adm-linha-teste"' : ''}>
       <td>${comControlos ? `<input type="checkbox" class="bulk-cb" data-num="${esc(o.numero_encomenda)}">` : ''}</td>
-      <td><a href="/admin/encomendas/${o.numero_encomenda}">${o.numero_encomenda}</a>${o.teste ? ' <span class="badge badge-teste">Teste</span>' : ''}</td>
+      <td><a href="/funitocorp/encomendas/${o.numero_encomenda}">${o.numero_encomenda}</a>${o.teste ? ' <span class="badge badge-teste">Teste</span>' : ''}</td>
       <td>${esc(o.nome_cliente)}</td>
       <td class="num">${euro(o.total)}</td>
       <td>${badge(o.estado_pagamento)}</td>
@@ -431,7 +431,7 @@
           <td><button class="adm-toggle ${p.disponivel ? 'on' : ''}" data-campo="disponivel" aria-label="Disponível"></button></td>
           <td><button class="adm-toggle ${p.destaque ? 'on' : ''}" data-campo="destaque" aria-label="Destaque"></button></td>
           <td style="white-space:nowrap">
-            <a href="/admin/produtos/${p.id}">Editar</a> ·
+            <a href="/funitocorp/produtos/${p.id}">Editar</a> ·
             <a href="#" data-campo="ativo" class="apagar">${p.ativo ? 'Desativar' : 'Reativar'}</a>
           </td>
         </tr>`;
@@ -528,7 +528,7 @@
         }
         imagens = p.imagens;
         renderImagens();
-      }).catch(() => { location.href = '/admin/produtos'; });
+      }).catch(() => { location.href = '/funitocorp/produtos'; });
     }
 
     form.addEventListener('submit', async (e) => {
@@ -564,7 +564,7 @@
           method: idProduto ? 'PUT' : 'POST',
           body: dados
         });
-        location.href = '/admin/produtos';
+        location.href = '/funitocorp/produtos';
       } catch (err) {
         if (err.dados?.erros) {
           for (const [campo, msg] of Object.entries(err.dados.erros)) {
