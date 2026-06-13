@@ -70,5 +70,6 @@ router.get('/encomendas/:numero', (req, res) => res.send(render('encomenda', { T
 router.get('/produtos', (req, res) => res.send(render('produtos', { TITULO: `Produtos | Admin ${config.nome}` })));
 router.get('/produtos/novo', (req, res) => res.send(render('produto-form', { TITULO: `Novo produto | Admin ${config.nome}` })));
 router.get('/produtos/:id', (req, res) => res.send(render('produto-form', { TITULO: `Editar produto | Admin ${config.nome}` })));
+router.get('/clientes', (req, res) => res.send(render('clientes', { TITULO: `Clientes | Admin ${config.nome}` })));
 
 module.exports = router;

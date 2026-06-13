@@ -436,4 +436,17 @@ router.get('/backups', (req, res) => {
   }
 });
 
+router.get('/clientes', (req, res) => {
+  const clientes = db.prepare(`
+    SELECT c.id, c.nome, c.email, c.google_id, c.created_at,
+           COUNT(o.id) AS num_encomendas,
+           SUM(CASE WHEN o.estado_pagamento = 'paga' THEN o.total ELSE 0 END) AS total_gasto
+    FROM customers c
+    LEFT JOIN orders o ON o.email = c.email
+    GROUP BY c.id
+    ORDER BY c.created_at DESC
+  `).all();
+  res.json(clientes);
+});
+
 module.exports = router;

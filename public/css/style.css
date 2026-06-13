@@ -1277,20 +1277,35 @@ body[data-page="produto"] main { padding-bottom: 90px; }
 .conta-legal a { color: var(--cor-acento); text-decoration: underline; }
 
 /* Área autenticada */
-.conta-area { padding: 1.5rem 1rem 3rem; }
+.conta-area { padding: 1.5rem 1rem 3rem; min-height: 60vh; }
 .conta-area-inner { max-width: 700px; margin: 0 auto; }
 
 .conta-area-topo {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 1.8rem;
   gap: 1rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--cor-linha);
 }
-.conta-area-topo h1 { font-size: 1.5rem; }
-.conta-email-label { font-size: .85rem; color: var(--cor-texto-suave); margin-top: .2rem; }
+.conta-area-topo h1 { font-size: 1.3rem; }
+.conta-email-label { font-size: .82rem; color: var(--cor-texto-suave); margin-top: .15rem; }
 
 .enc-estado { padding: 2rem 0; color: var(--cor-texto-suave); font-size: .95rem; }
+
+.enc-vazio-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--cor-texto-suave);
+}
+.enc-vazio-wrap svg { opacity: .35; }
+.enc-vazio-wrap p { font-size: .95rem; margin: 0; }
 
 .enc-lista { display: flex; flex-direction: column; gap: .8rem; }
 

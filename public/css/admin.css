@@ -273,6 +273,7 @@ textarea { resize: vertical; }
 .badge-reembolsada { background: #F3E3E1; color: #A03A30; }
 .badge-cancelada { background: #ECEBF1; color: #6B6877; }
 .badge-teste { background: #F0F0F0; color: #888; }
+.badge-google { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: #4285F4; color: #fff; border-radius: 4px; font-size: .7rem; font-weight: 700; }
 .adm-linha-teste td { opacity: .55; }
 .adm-btn-apagar { background: none; border: none; color: #ccc; cursor: pointer; font-size: .9rem; padding: .2rem .4rem; border-radius: 4px; }
 .adm-btn-apagar:hover { background: #fee; color: #c0392b; }

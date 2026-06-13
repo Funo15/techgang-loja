@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:admin-head}}
+</head>
+<body data-adm-page="clientes">
+{{include:admin-nav}}
+<main class="adm-main">
+  <div class="adm-cabeca">
+    <h1>Clientes</h1>
+  </div>
+
+  <div class="adm-filtros">
+    <input type="search" id="f-pesquisa" placeholder="Pesquisar nome ou email…">
+  </div>
+
+  <table class="adm-tabela" id="adm-tabela">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Registado</th>
+        <th>Encomendas</th>
+        <th>Total gasto</th>
+        <th>Google</th>
+      </tr>
+    </thead>
+    <tbody id="adm-corpo"></tbody>
+  </table>
+  <p id="adm-vazio" class="adm-vazio" hidden>Nenhum cliente encontrado.</p>
+</main>
+<script>
+(function() {
+  const fmt = v => (v / 100).toFixed(2).replace('.', ',') + ' €';
+  const fmtData = s => new Date(s).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  let todos = [];
+
+  function renderizar(lista) {
+    const corpo = document.getElementById('adm-corpo');
+    document.getElementById('adm-vazio').hidden = lista.length > 0;
+    if (!lista.length) { corpo.innerHTML = ''; return; }
+    corpo.innerHTML = lista.map(c => `
+      <tr>
+        <td>${c.nome}</td>
+        <td><a href="mailto:${c.email}">${c.email}</a></td>
+        <td>${fmtData(c.created_at)}</td>
+        <td>${c.num_encomendas}</td>
+        <td>${c.total_gasto ? fmt(c.total_gasto) : '—'}</td>
+        <td>${c.google_id ? '<span class="badge-google">G</span>' : '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  fetch('/api/admin/clientes').then(r => r.json()).then(data => {
+    todos = data;
+    renderizar(todos);
+  });
+
+  document.getElementById('f-pesquisa').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    renderizar(q ? todos.filter(c => c.nome.toLowerCase().includes(q) || c.email.toLowerCase().includes(q)) : todos);
+  });
+})();
+</script>
+</body>
+</html>
