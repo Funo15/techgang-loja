@@ -11,7 +11,7 @@
   </div>
 </main>
 {{include:footer}}
-<script>
+<script nonce="{{NONCE}}">
 (function() {
   const numero = location.pathname.split('/').pop();
   const fmt = v => (v / 100).toFixed(2).replace('.', ',') + ' €';

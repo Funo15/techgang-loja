@@ -8,7 +8,7 @@ require('dotenv').config(); // .env primeiro — Stripe/SMTP dependem disto
 const express = require('express');
 const path = require('path');
 const config = require('./config');
-const { limitadorGeral, helmetConfig } = require('./lib/seguranca');
+const { limitadorGeral, gerarNonce, helmetConfig } = require('./lib/seguranca');
 const PATHS = require('./lib/paths');
 const { erro500 } = require('./lib/logger');
 const { agendarBackupDiario } = require('./lib/backup');
@@ -28,7 +28,8 @@ require('./db/database');
 
 const app = express();
 
-// Headers de segurança (antes de tudo)
+// Nonce por pedido (antes do Helmet — a CSP usa res.locals.nonce)
+app.use(gerarNonce);
 app.use(helmetConfig);
 
 // Confiar no proxy do Railway para req.ip correto

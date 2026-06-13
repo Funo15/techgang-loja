@@ -29,7 +29,7 @@
   </table>
   <p id="adm-vazio" class="adm-vazio" hidden>Nenhum cliente encontrado.</p>
 </main>
-<script>
+<script nonce="{{NONCE}}">
 (function() {
   const fmt = v => (v / 100).toFixed(2).replace('.', ',') + ' €';
   const fmtData = s => new Date(s).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'numeric' });

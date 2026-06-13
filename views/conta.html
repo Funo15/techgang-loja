@@ -68,7 +68,7 @@
 </main>
 {{include:footer}}
 <script src="https://accounts.google.com/gsi/client" async></script>
-<script>
+<script nonce="{{NONCE}}">
 window.handleGoogleSignIn = async function(response) {
   try {
     const r = await fetch('/api/conta/google', {
@@ -84,7 +84,7 @@ window.handleGoogleSignIn = async function(response) {
   } catch { alert('Erro de ligação.'); }
 };
 </script>
-<script>
+<script nonce="{{NONCE}}">
 (function() {
   // Esconde secção Google se não configurado
   const gcId = '{{GOOGLE_CLIENT_ID}}';

@@ -35,6 +35,7 @@ function render(nomeView, extra = {}) {
     FONTE_CORPO: f.corpo.replace(/ /g, '+'),
     FONTE_MONO: f.mono.replace(/ /g, '+'),
     ANO: String(new Date().getFullYear()),
+    NONCE: '',
     ...extra
   };
   return html.replace(/\{\{([A-Z_]+)\}\}/g, (m, chave) => tokens[chave] ?? m);
@@ -44,7 +45,7 @@ function render(nomeView, extra = {}) {
 
 router.get('/login', (req, res) => {
   if (sessaoValida(req)) return res.redirect('/funitocorp');
-  res.send(render('login', { TITULO: `Admin | ${config.nome}` }));
+  res.send(render('login', { TITULO: `Admin | ${config.nome}`, NONCE: res.locals.nonce }));
 });
 
 router.post('/login', limitadorAuth, delayAdmin, (req, res) => {
@@ -89,13 +90,13 @@ router.post('/logout', (req, res) => {
 
 router.use(exigirAdmin);
 
-router.get('/', (req, res) => res.send(render('dashboard', { TITULO: `Admin | ${config.nome}` })));
-router.get('/encomendas', (req, res) => res.send(render('encomendas', { TITULO: `Encomendas | Admin ${config.nome}` })));
-router.get('/encomendas/:numero', (req, res) => res.send(render('encomenda', { TITULO: `${req.params.numero} | Admin ${config.nome}` })));
-router.get('/produtos', (req, res) => res.send(render('produtos', { TITULO: `Produtos | Admin ${config.nome}` })));
-router.get('/produtos/novo', (req, res) => res.send(render('produto-form', { TITULO: `Novo produto | Admin ${config.nome}` })));
-router.get('/produtos/:id', (req, res) => res.send(render('produto-form', { TITULO: `Editar produto | Admin ${config.nome}` })));
-router.get('/clientes', (req, res) => res.send(render('clientes', { TITULO: `Clientes | Admin ${config.nome}` })));
+router.get('/', (req, res) => res.send(render('dashboard', { TITULO: `Admin | ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/encomendas', (req, res) => res.send(render('encomendas', { TITULO: `Encomendas | Admin ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/encomendas/:numero', (req, res) => res.send(render('encomenda', { TITULO: `${req.params.numero} | Admin ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/produtos', (req, res) => res.send(render('produtos', { TITULO: `Produtos | Admin ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/produtos/novo', (req, res) => res.send(render('produto-form', { TITULO: `Novo produto | Admin ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/produtos/:id', (req, res) => res.send(render('produto-form', { TITULO: `Editar produto | Admin ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/clientes', (req, res) => res.send(render('clientes', { TITULO: `Clientes | Admin ${config.nome}`, NONCE: res.locals.nonce })));
 
 // Setup 2FA — mostra QR code para configurar Google Authenticator
 router.get('/setup-2fa', async (req, res) => {
@@ -110,7 +111,8 @@ router.get('/setup-2fa', async (req, res) => {
     TOTP_SECRET_FORMATADO: segredoFormatado,
     QR_DATA_URL: qr,
     TOTP_ATIVO_CLASS: totpAtivo() ? 'hidden' : '',
-    ALERTA_TOTP: totpAtivo() ? '<div class="adm-alerta adm-alerta-ok">✓ O 2FA está ativo. O login já requer código do Google Authenticator.</div>' : ''
+    ALERTA_TOTP: totpAtivo() ? '<div class="adm-alerta adm-alerta-ok">✓ O 2FA está ativo. O login já requer código do Google Authenticator.</div>' : '',
+    NONCE: res.locals.nonce
   }));
 });
 

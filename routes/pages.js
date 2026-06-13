@@ -51,11 +51,11 @@ function configPublico() {
 
 // Pixels: IDs injetados como config — o carregamento real é feito por cookies.js
 // APENAS após consentimento do utilizador (RGPD).
-function pixelsHtml() {
+function pixelsHtml(nonce) {
   const meta = process.env.META_PIXEL_ID || '';
   const tiktok = process.env.TIKTOK_PIXEL_ID || '';
   if (!meta && !tiktok) return '';
-  return `<script>window.PIXELS={meta:"${meta}",tiktok:"${tiktok}"};<\/script>`;
+  return `<script nonce="${nonce}">window.PIXELS={meta:"${meta}",tiktok:"${tiktok}"};<\/script>`;
 }
 
 // Renderiza uma view: resolve partials e substitui tokens
@@ -67,6 +67,7 @@ function render(nomeView, extra = {}) {
     fs.readFileSync(path.join(VIEWS, 'partials', `${nome}.html`), 'utf8')
   );
 
+  const nonce = extra.NONCE || '';
   // Tokens de branding + extras da página
   const tokens = {
     NOME: config.nome,
@@ -74,7 +75,8 @@ function render(nomeView, extra = {}) {
     EMAIL: config.emailContacto,
     CSS_VARS: cssVars(),
     CONFIG_JSON: configPublico(),
-    PIXELS: pixelsHtml(),
+    PIXELS: pixelsHtml(nonce),
+    NONCE: nonce,
     FONTE_TITULO: config.fontes.titulo.replace(/ /g, '+'),
     FONTE_CORPO: config.fontes.corpo.replace(/ /g, '+'),
     FONTE_MONO: config.fontes.mono.replace(/ /g, '+'),
@@ -85,18 +87,18 @@ function render(nomeView, extra = {}) {
 }
 
 // --- Páginas ---
-router.get('/', (req, res) => res.send(render('home', { TITULO: config.nome })));
-router.get('/produtos', (req, res) => res.send(render('produtos', { TITULO: `Produtos | ${config.nome}` })));
-router.get('/produto/:slug', (req, res) => res.send(render('produto', { TITULO: config.nome })));
-router.get('/carrinho', (req, res) => res.send(render('carrinho', { TITULO: `Carrinho | ${config.nome}` })));
-router.get('/checkout', (req, res) => res.send(render('checkout', { TITULO: `Checkout | ${config.nome}` })));
-router.get('/obrigado', (req, res) => res.send(render('obrigado', { TITULO: `Obrigado | ${config.nome}` })));
+router.get('/', (req, res) => res.send(render('home', { TITULO: config.nome, NONCE: res.locals.nonce })));
+router.get('/produtos', (req, res) => res.send(render('produtos', { TITULO: `Produtos | ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/produto/:slug', (req, res) => res.send(render('produto', { TITULO: config.nome, NONCE: res.locals.nonce })));
+router.get('/carrinho', (req, res) => res.send(render('carrinho', { TITULO: `Carrinho | ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/checkout', (req, res) => res.send(render('checkout', { TITULO: `Checkout | ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/obrigado', (req, res) => res.send(render('obrigado', { TITULO: `Obrigado | ${config.nome}`, NONCE: res.locals.nonce })));
 
-// Páginas legais (conteúdo placeholder nesta fase)
-router.get('/termos', (req, res) => res.send(render('termos', { TITULO: `Termos e Condições | ${config.nome}` })));
-router.get('/privacidade', (req, res) => res.send(render('privacidade', { TITULO: `Política de Privacidade | ${config.nome}` })));
-router.get('/devolucoes', (req, res) => res.send(render('devolucoes', { TITULO: `Trocas e Devoluções | ${config.nome}` })));
-router.get('/contactos', (req, res) => res.send(render('contactos', { TITULO: `Contactos | ${config.nome}` })));
+// Páginas legais
+router.get('/termos', (req, res) => res.send(render('termos', { TITULO: `Termos e Condições | ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/privacidade', (req, res) => res.send(render('privacidade', { TITULO: `Política de Privacidade | ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/devolucoes', (req, res) => res.send(render('devolucoes', { TITULO: `Trocas e Devoluções | ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/contactos', (req, res) => res.send(render('contactos', { TITULO: `Contactos | ${config.nome}`, NONCE: res.locals.nonce })));
 
 // Área de cliente
 const { getCliente } = require('../lib/conta-auth');
@@ -106,18 +108,19 @@ router.get('/conta', (req, res) => {
   res.send(render('conta', {
     TITULO: `A minha conta | ${config.nome}`,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
-    BASE_URL: process.env.BASE_URL || 'http://localhost:3002'
+    BASE_URL: process.env.BASE_URL || 'http://localhost:3002',
+    NONCE: res.locals.nonce
   }));
 });
 router.get('/conta/encomendas', (req, res) => {
   const c = getCliente(req);
   if (!c) return res.redirect('/conta');
-  res.send(render('conta-encomendas', { TITULO: `As minhas encomendas | ${config.nome}` }));
+  res.send(render('conta-encomendas', { TITULO: `As minhas encomendas | ${config.nome}`, NONCE: res.locals.nonce }));
 });
 router.get('/conta/encomenda/:numero', (req, res) => {
   const c = getCliente(req);
   if (!c) return res.redirect('/conta');
-  res.send(render('conta-encomenda', { TITULO: `Encomenda | ${config.nome}` }));
+  res.send(render('conta-encomenda', { TITULO: `Encomenda | ${config.nome}`, NONCE: res.locals.nonce }));
 });
 
 module.exports = router;
