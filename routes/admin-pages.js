@@ -99,10 +99,9 @@ router.get('/clientes', (req, res) => res.send(render('clientes', { TITULO: `Cli
 
 // Setup 2FA — mostra QR code para configurar Google Authenticator
 router.get('/setup-2fa', async (req, res) => {
-  const { authenticator } = require('otplib');
   const QRCode = require('qrcode');
   const segredo = gerarSegredoTotp();
-  const otpauth = authenticator.keyuri('admin', config.nome, segredo);
+  const otpauth = `otpauth://totp/${encodeURIComponent(config.nome)}:admin?secret=${segredo}&issuer=${encodeURIComponent(config.nome)}&algorithm=SHA1&digits=6&period=30`;
   const qr = await QRCode.toDataURL(otpauth);
   res.send(render('setup-2fa', {
     TITULO: `Setup 2FA | Admin ${config.nome}`,
