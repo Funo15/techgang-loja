@@ -73,8 +73,9 @@ CREATE TABLE IF NOT EXISTS customers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nome TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
-  salt TEXT NOT NULL,
+  password_hash TEXT NOT NULL DEFAULT '',
+  salt TEXT NOT NULL DEFAULT '',
+  google_id TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

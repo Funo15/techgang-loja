@@ -1240,6 +1240,9 @@ body[data-page="produto"] main { padding-bottom: 90px; }
   margin-bottom: 1.4rem;
 }
 
+.conta-google { display: flex; flex-direction: column; align-items: center; margin: 1.2rem 0 0; }
+.conta-divisor { width: 100%; display: flex; align-items: center; gap: .75rem; margin: 1.2rem 0 0; color: var(--cor-texto-suave); font-size: .82rem; }
+.conta-divisor::before, .conta-divisor::after { content: ''; flex: 1; height: 1px; background: var(--cor-linha); }
 .conta-form .campo-grupo { margin-bottom: 1rem; }
 .conta-form label { display: block; font-size: .83rem; font-weight: 600; margin-bottom: .35rem; color: var(--cor-texto-suave); }
 .conta-form input {

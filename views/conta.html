@@ -10,6 +10,25 @@
       <button class="conta-tab" data-tab="registar">Criar conta</button>
     </div>
 
+    <!-- Google Sign-In -->
+    <div class="conta-google" id="conta-google-wrap">
+      <div id="g_id_onload"
+        data-client_id="{{GOOGLE_CLIENT_ID}}"
+        data-callback="handleGoogleSignIn"
+        data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"
+        data-type="standard"
+        data-shape="pill"
+        data-theme="outline"
+        data-text="signin_with"
+        data-size="large"
+        data-locale="pt-PT"
+        data-width="300">
+      </div>
+      <div class="conta-divisor"><span>ou</span></div>
+    </div>
+
     <!-- Login -->
     <form class="conta-form" id="form-entrar">
       <h1 class="conta-titulo">Bem-vindo de volta</h1>
@@ -47,8 +66,28 @@
   </div>
 </main>
 {{include:footer}}
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+window.handleGoogleSignIn = async function(response) {
+  try {
+    const r = await fetch('/api/conta/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential })
+    });
+    const d = await r.json();
+    if (!r.ok) { alert(d.erro || 'Erro no login com Google.'); return; }
+    const params = new URLSearchParams(location.search);
+    const redir = params.get('redir');
+    location.href = redir && redir.startsWith('/conta') ? redir : '/conta/encomendas';
+  } catch { alert('Erro de ligação.'); }
+};
+</script>
 <script>
 (function() {
+  // Esconde secção Google se não configurado
+  const gcId = '{{GOOGLE_CLIENT_ID}}';
+  if (!gcId) document.getElementById('conta-google-wrap').hidden = true;
   const tabs = document.querySelectorAll('.conta-tab');
   const formEntrar = document.getElementById('form-entrar');
   const formReg = document.getElementById('form-registar');

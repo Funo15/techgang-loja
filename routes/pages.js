@@ -103,7 +103,10 @@ const { getCliente } = require('../lib/conta-auth');
 router.get('/conta', (req, res) => {
   const c = getCliente(req);
   if (c) return res.redirect('/conta/encomendas');
-  res.send(render('conta', { TITULO: `A minha conta | ${config.nome}` }));
+  res.send(render('conta', {
+    TITULO: `A minha conta | ${config.nome}`,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || ''
+  }));
 });
 router.get('/conta/encomendas', (req, res) => {
   const c = getCliente(req);

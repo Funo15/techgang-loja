@@ -29,6 +29,20 @@ router.post('/entrar', limitadorConta, async (req, res) => {
   res.json({ ok: true });
 });
 
+router.post('/google', limitadorConta, async (req, res) => {
+  const { credential } = req.body || {};
+  if (!credential) return res.status(400).json({ erro: 'Token em falta.' });
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) return res.status(503).json({ erro: 'Login com Google não configurado.' });
+  try {
+    const cliente = await auth.autenticarOuRegistarGoogle(credential, clientId);
+    auth.criarSessao(cliente.id, res);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(401).json({ erro: err.message || 'Erro no login com Google.' });
+  }
+});
+
 router.post('/sair', (req, res) => {
   auth.terminarSessao(req, res);
   res.json({ ok: true });
