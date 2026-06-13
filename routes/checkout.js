@@ -9,9 +9,20 @@
 // ============================================================
 
 const express = require('express');
+const crypto = require('crypto');
 const db = require('../db/database');
 const config = require('../config');
 const { encomendaCriada } = require('../lib/logger');
+
+// Token de verificação de encomenda: HMAC curto derivado do número.
+// Vai no URL da página /obrigado e é exigido na API pública.
+function tokenEncomenda(numero) {
+  return crypto
+    .createHmac('sha256', process.env.ADMIN_PASSWORD || 'tg-fallback-secret')
+    .update(numero)
+    .digest('hex')
+    .slice(0, 24);
+}
 
 const router = express.Router();
 
@@ -111,7 +122,7 @@ router.post('/checkout', async (req, res) => {
   // 5) Sem Stripe configurado: modo dev — segue para /obrigado na mesma
   if (!stripe) {
     console.warn(`[checkout] STRIPE_SECRET_KEY não configurada — encomenda ${numero} criada sem pagamento (modo dev).`);
-    return res.json({ url: `/obrigado?enc=${numero}` });
+    return res.json({ url: `/obrigado?enc=${numero}&t=${tokenEncomenda(numero)}` });
   }
 
   // 6) Stripe Checkout Session (hosted)
@@ -135,7 +146,7 @@ router.post('/checkout', async (req, res) => {
     line_items: lineItems,
     customer_email: cliente.email.trim(),
     metadata: { numero_encomenda: numero },
-    success_url: `${BASE_URL}/obrigado?enc=${numero}`,
+    success_url: `${BASE_URL}/obrigado?enc=${numero}&t=${tokenEncomenda(numero)}`,
     cancel_url: `${BASE_URL}/checkout`
   };
 
@@ -149,15 +160,29 @@ router.post('/checkout', async (req, res) => {
 });
 
 // ---------- GET /api/encomendas/:numero ----------
-// Só o necessário para a página /obrigado — nada de moradas.
+// Exige token de verificação (?t=...) OU sessão de cliente autenticada.
 router.get('/encomendas/:numero', (req, res) => {
   const row = db.prepare(`
-    SELECT numero_encomenda, estado_pagamento, items, subtotal, portes, total, created_at
+    SELECT numero_encomenda, estado_pagamento, items, subtotal, portes, total, created_at, email
     FROM orders WHERE numero_encomenda = ?
   `).get(req.params.numero);
   if (!row) return res.status(404).json({ erro: 'Encomenda não encontrada' });
 
-  const items = JSON.parse(row.items);
+  // Verificar autorização: token HMAC no URL ou cliente autenticado dono da encomenda
+  const { getCliente } = require('../lib/conta-auth');
+  const cliente = getCliente(req);
+  const tokenFornecido = String(req.query.t || '');
+  const tokenEsperado = tokenEncomenda(row.numero_encomenda);
+  const tokenValido = tokenFornecido.length === tokenEsperado.length &&
+    crypto.timingSafeEqual(Buffer.from(tokenFornecido), Buffer.from(tokenEsperado));
+  const clienteAutorizado = cliente && cliente.email === row.email;
+
+  if (!tokenValido && !clienteAutorizado) {
+    return res.status(403).json({ erro: 'Acesso não autorizado.' });
+  }
+
+  const { email: _, ...dadosPublicos } = row; // nunca expor o email neste endpoint
+  const items = JSON.parse(dadosPublicos.items);
   // Prazo de entrega: o intervalo mais longo entre os produtos
   let prazo = '8-12', maxFim = 0;
   for (const i of items) {
@@ -165,7 +190,7 @@ router.get('/encomendas/:numero', (req, res) => {
     const fim = Number(String(p?.tempo_envio_dias || '').split('-').pop());
     if (fim > maxFim) { maxFim = fim; prazo = p.tempo_envio_dias; }
   }
-  res.json({ ...row, items, prazo_envio_dias: prazo });
+  res.json({ ...dadosPublicos, items, prazo_envio_dias: prazo });
 });
 
 module.exports = router;
