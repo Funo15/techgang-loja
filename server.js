@@ -39,6 +39,7 @@ app.set('trust proxy', 1);
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), require('./routes/stripe-webhook'));
 
 app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(require('cookie-parser')());
 
 // Rate limiting geral na API pública (webhook é skipped automaticamente)

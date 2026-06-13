@@ -30,15 +30,25 @@ router.post('/entrar', limitadorConta, async (req, res) => {
 });
 
 router.post('/google', limitadorConta, async (req, res) => {
-  const { credential } = req.body || {};
-  if (!credential) return res.status(400).json({ erro: 'Token em falta.' });
+  // Aceita JSON (popup) e form-urlencoded (redirect mode do Google)
+  const credential = req.body?.credential;
+  const isRedirect = req.headers['content-type']?.includes('application/x-www-form-urlencoded');
+  if (!credential) {
+    if (isRedirect) return res.redirect('/conta?erro=google');
+    return res.status(400).json({ erro: 'Token em falta.' });
+  }
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  if (!clientId) return res.status(503).json({ erro: 'Login com Google não configurado.' });
+  if (!clientId) {
+    if (isRedirect) return res.redirect('/conta?erro=google');
+    return res.status(503).json({ erro: 'Login com Google não configurado.' });
+  }
   try {
     const cliente = await auth.autenticarOuRegistarGoogle(credential, clientId);
     auth.criarSessao(cliente.id, res);
+    if (isRedirect) return res.redirect('/conta/encomendas');
     res.json({ ok: true });
   } catch (err) {
+    if (isRedirect) return res.redirect('/conta?erro=google');
     res.status(401).json({ erro: err.message || 'Erro no login com Google.' });
   }
 });

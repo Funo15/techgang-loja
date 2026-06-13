@@ -14,15 +14,15 @@
     <div class="conta-google" id="conta-google-wrap">
       <div id="g_id_onload"
         data-client_id="{{GOOGLE_CLIENT_ID}}"
-        data-callback="handleGoogleSignIn"
-        data-ux_mode="popup"
+        data-login_uri="{{BASE_URL}}/api/conta/google"
+        data-ux_mode="redirect"
         data-auto_prompt="false">
       </div>
       <div class="g_id_signin"
         data-type="standard"
         data-shape="pill"
         data-theme="outline"
-        data-text="signin_with"
+        data-text="continue_with"
         data-size="large"
         data-locale="pt-PT"
         data-width="300">
@@ -89,6 +89,13 @@ window.handleGoogleSignIn = async function(response) {
   // Esconde secção Google se não configurado
   const gcId = '{{GOOGLE_CLIENT_ID}}';
   if (!gcId) document.getElementById('conta-google-wrap').hidden = true;
+
+  // Erro de redirect Google
+  if (new URLSearchParams(location.search).get('erro') === 'google') {
+    const el = document.getElementById('entrar-erro');
+    el.textContent = 'Erro ao entrar com Google. Tenta novamente.';
+    el.hidden = false;
+  }
   const tabs = document.querySelectorAll('.conta-tab');
   const formEntrar = document.getElementById('form-entrar');
   const formReg = document.getElementById('form-registar');

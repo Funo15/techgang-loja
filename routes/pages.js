@@ -105,7 +105,8 @@ router.get('/conta', (req, res) => {
   if (c) return res.redirect('/conta/encomendas');
   res.send(render('conta', {
     TITULO: `A minha conta | ${config.nome}`,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || ''
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+    BASE_URL: process.env.BASE_URL || 'http://localhost:3002'
   }));
 });
 router.get('/conta/encomendas', (req, res) => {
