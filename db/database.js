@@ -19,6 +19,8 @@ db.exec(schema);
 // Migrações incrementais (colunas adicionadas após o schema inicial)
 try { db.exec(`ALTER TABLE orders ADD COLUMN teste INTEGER NOT NULL DEFAULT 0`); } catch {};
 try { db.exec(`ALTER TABLE customers ADD COLUMN google_id TEXT`); } catch {};
+try { db.exec(`ALTER TABLE orders ADD COLUMN ip TEXT`); } catch {};
+try { db.exec(`ALTER TABLE orders ADD COLUMN user_agent TEXT`); } catch {};
 
 // ------------------------------------------------------------
 // SEED — só corre se a tabela de produtos estiver vazia.

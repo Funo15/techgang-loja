@@ -131,13 +131,14 @@ router.get('/encomendas.csv', (req, res) => {
 
   const cabecalho = ['numero', 'data', 'cliente', 'email', 'telefone', 'morada', 'codigo_postal',
     'cidade', 'pais', 'items', 'subtotal_eur', 'portes_eur', 'total_eur',
-    'estado_pagamento', 'estado_fulfillment', 'tracking'].join(';');
+    'estado_pagamento', 'estado_fulfillment', 'tracking', 'ip', 'user_agent'].join(';');
   const linhas = rows.map(o => {
     const items = JSON.parse(o.items).map(i => `${i.nome}${i.cor ? ` (${i.cor})` : ''} x${i.qtd}`).join(' | ');
     return [o.numero_encomenda, dataPT(o.created_at), limpar(o.nome_cliente), o.email, o.telefone,
       limpar(o.morada), o.codigo_postal, limpar(o.cidade), limpar(o.pais), limpar(items),
       euro(o.subtotal), euro(o.portes), euro(o.total),
-      o.estado_pagamento, o.estado_fulfillment, o.tracking_number || ''].join(';');
+      o.estado_pagamento, o.estado_fulfillment, o.tracking_number || '',
+      o.ip || '', limpar(o.user_agent || '')].join(';');
   });
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');

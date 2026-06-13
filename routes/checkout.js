@@ -106,15 +106,18 @@ router.post('/checkout', async (req, res) => {
 
   // 4) Cria a encomenda (estado_pagamento "pendente")
   const numero = gerarNumeroEncomenda();
+  const ip = req.ip || null;
+  const userAgent = String(req.headers['user-agent'] || '').slice(0, 300) || null;
   db.prepare(`
     INSERT INTO orders
       (numero_encomenda, nome_cliente, email, telefone, morada, codigo_postal,
-       cidade, pais, items, subtotal, portes, total)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       cidade, pais, items, subtotal, portes, total, ip, user_agent)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     numero, cliente.nome.trim(), cliente.email.trim(), cliente.telefone,
     cliente.morada.trim(), cliente.codigo_postal, cliente.cidade.trim(),
-    cliente.pais.trim(), JSON.stringify(itemsValidados), subtotal, portes, total
+    cliente.pais.trim(), JSON.stringify(itemsValidados), subtotal, portes, total,
+    ip, userAgent
   );
 
   encomendaCriada(numero, total);

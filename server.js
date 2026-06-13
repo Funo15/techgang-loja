@@ -11,7 +11,7 @@ const config = require('./config');
 const { limitadorGeral, gerarNonce, helmetConfig } = require('./lib/seguranca');
 const PATHS = require('./lib/paths');
 const { erro500 } = require('./lib/logger');
-const { agendarBackupDiario } = require('./lib/backup');
+const { agendarBackupDiario, limparPendentesAntigos } = require('./lib/backup');
 
 // Handlers globais — logar e sair limpo em vez de ficar num estado indefinido
 process.on('uncaughtException', (err) => {
@@ -105,4 +105,7 @@ const host = process.env.PORT ? '0.0.0.0' : '127.0.0.1'; // Railway usa 0.0.0.0
 app.listen(porta, host, () => {
   console.log(`${config.nome} a correr em http://localhost:${porta}`);
   agendarBackupDiario();
+  // Limpar encomendas pendentes antigas de hora em hora
+  limparPendentesAntigos();
+  setInterval(limparPendentesAntigos, 60 * 60 * 1000);
 });
