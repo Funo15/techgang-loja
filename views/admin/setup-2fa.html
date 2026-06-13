@@ -28,8 +28,9 @@
           <div class="adm-qr-wrap">
             <img src="{{QR_DATA_URL}}" alt="QR code 2FA" width="280" height="280">
           </div>
-          <p class="adm-setup-ou">Ou insere manualmente no Google Authenticator:</p>
-          <code class="adm-totp-secret">{{TOTP_SECRET_FORMATADO}}</code>
+          <p class="adm-setup-ou">Ou insere manualmente (copia exatamente, sem espaços):</p>
+          <code class="adm-totp-secret" id="secret-manual">{{TOTP_SECRET}}</code>
+          <button onclick="navigator.clipboard.writeText('{{TOTP_SECRET}}').then(()=>this.textContent='Copiado!')" style="margin-top:.5rem;font-size:.8rem;padding:.3rem .7rem;border-radius:8px;border:1px solid #ccc;cursor:pointer;background:#fff">Copiar chave</button>
         </div>
       </div>
       <div class="adm-setup-passo">
