@@ -263,10 +263,6 @@
     });
   }
 
-  // Conta de cliente ainda não existe
-  document.getElementById('btn-conta')?.addEventListener('click', () => {
-    mostrarToast('As contas de cliente chegam em breve 👀');
-  });
 
   // ============================================================
   // PESQUISA (overlay)
