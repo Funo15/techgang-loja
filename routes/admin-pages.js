@@ -103,9 +103,11 @@ router.get('/setup-2fa', async (req, res) => {
   const segredo = gerarSegredoTotp();
   const otpauth = `otpauth://totp/${encodeURIComponent(config.nome)}:admin?secret=${segredo}&issuer=${encodeURIComponent(config.nome)}&algorithm=SHA1&digits=6&period=30`;
   const qr = await QRCode.toDataURL(otpauth, { width: 400, margin: 3, errorCorrectionLevel: 'M' });
+  const segredoFormatado = segredo.match(/.{1,4}/g).join(' ');
   res.send(render('setup-2fa', {
     TITULO: `Setup 2FA | Admin ${config.nome}`,
     TOTP_SECRET: segredo,
+    TOTP_SECRET_FORMATADO: segredoFormatado,
     QR_DATA_URL: qr,
     ALERTA_TOTP: totpAtivo() ? '<div class="adm-alerta adm-alerta-ok">O 2FA já está ativo. Para reconfigurar, gera um novo segredo abaixo e adiciona-o ao Railway.</div>' : ''
   }));
