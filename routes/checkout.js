@@ -43,12 +43,14 @@ function validarCliente(cliente = {}) {
   return erros;
 }
 
-// Gera o número de encomenda TG-2026-0001 (sequência por ano)
+// Gera o número de encomenda (começa em 1000 para não revelar volume)
 function gerarNumeroEncomenda() {
   const ano = new Date().getFullYear();
   const prefixo = `${config.prefixoEncomenda}-${ano}-`;
-  const total = db.prepare('SELECT COUNT(*) AS c FROM orders WHERE numero_encomenda LIKE ?').get(`${prefixo}%`).c;
-  return `${prefixo}${String(total + 1).padStart(4, '0')}`;
+  const r = db.prepare('SELECT MAX(CAST(SUBSTR(numero_encomenda, ?) AS INTEGER)) AS m FROM orders WHERE numero_encomenda LIKE ?')
+    .get(prefixo.length + 1, `${prefixo}%`);
+  const seq = Math.max(r.m || 0, 999) + 1;
+  return `${prefixo}${String(seq).padStart(4, '0')}`;
 }
 
 // ---------- POST /api/checkout ----------
