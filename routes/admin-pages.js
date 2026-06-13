@@ -109,7 +109,8 @@ router.get('/setup-2fa', async (req, res) => {
     TOTP_SECRET: segredo,
     TOTP_SECRET_FORMATADO: segredoFormatado,
     QR_DATA_URL: qr,
-    ALERTA_TOTP: totpAtivo() ? '<div class="adm-alerta adm-alerta-ok">O 2FA já está ativo. Para reconfigurar, gera um novo segredo abaixo e adiciona-o ao Railway.</div>' : ''
+    TOTP_ATIVO_CLASS: totpAtivo() ? 'hidden' : '',
+    ALERTA_TOTP: totpAtivo() ? '<div class="adm-alerta adm-alerta-ok">✓ O 2FA está ativo. O login já requer código do Google Authenticator.</div>' : ''
   }));
 });
 
