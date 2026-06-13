@@ -102,7 +102,7 @@ router.get('/setup-2fa', async (req, res) => {
   const QRCode = require('qrcode');
   const segredo = gerarSegredoTotp();
   const otpauth = `otpauth://totp/${encodeURIComponent(config.nome)}:admin?secret=${segredo}&issuer=${encodeURIComponent(config.nome)}&algorithm=SHA1&digits=6&period=30`;
-  const qr = await QRCode.toDataURL(otpauth);
+  const qr = await QRCode.toDataURL(otpauth, { width: 400, margin: 3, errorCorrectionLevel: 'M' });
   res.send(render('setup-2fa', {
     TITULO: `Setup 2FA | Admin ${config.nome}`,
     TOTP_SECRET: segredo,
