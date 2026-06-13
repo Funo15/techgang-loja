@@ -23,7 +23,11 @@ body {
   color: var(--cor-texto);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+body > main { flex: 1; }
 
 img { display: block; max-width: 100%; height: auto; }
 a { color: inherit; }
@@ -1277,7 +1281,7 @@ body[data-page="produto"] main { padding-bottom: 90px; }
 .conta-legal a { color: var(--cor-acento); text-decoration: underline; }
 
 /* Área autenticada */
-.conta-area { padding: 1.5rem 1rem 3rem; min-height: 60vh; }
+.conta-area { padding: 1.5rem 1rem 3rem; }
 .conta-area-inner { max-width: 700px; margin: 0 auto; }
 
 .conta-area-topo {
