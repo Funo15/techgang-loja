@@ -531,7 +531,7 @@
           const input = form.elements[campo];
           if (!input) continue;
           if (input.type === 'checkbox') input.checked = !!valor;
-          else if (campo === 'cores' || campo === 'specs') input.value = JSON.stringify(valor);
+          else if (campo === 'cores' || campo === 'specs' || campo === 'variantes') input.value = JSON.stringify(valor);
           else if (camposEuro.includes(campo)) input.value = valor != null ? (valor / 100).toFixed(2) : '';
           else input.value = valor ?? '';
         }
@@ -548,12 +548,11 @@
 
       // JSON dos campos cores/specs validado aqui antes de enviar
       const dados = Object.fromEntries(new FormData(form));
-      for (const campo of ['cores', 'specs']) {
+      for (const campo of ['cores', 'specs', 'variantes']) {
         try { dados[campo] = dados[campo]?.trim() ? JSON.parse(dados[campo]) : []; }
         catch {
           const aviso = form.querySelector(`[data-erro="${campo}"]`);
-          aviso.textContent = 'JSON inválido.';
-          aviso.hidden = false;
+          if (aviso) { aviso.textContent = 'JSON inválido.'; aviso.hidden = false; }
           return;
         }
       }

@@ -684,7 +684,8 @@ body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
   margin-bottom: 0.7rem;
 }
 .produto-cores { margin-bottom: 1.4rem; }
-.cores-swatches { display: flex; gap: 0.7rem; }
+.cores-swatches { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.variante-grupo { margin-bottom: 0.8rem; }
 .swatch {
   width: 44px;
   height: 44px;
@@ -697,6 +698,23 @@ body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
 .swatch:hover { transform: translateY(-2px); }
 .swatch.ativo {
   box-shadow: 0 0 0 2px var(--cor-fundo-elevado), 0 0 0 4.5px var(--cor-acento);
+}
+.variante-btn {
+  padding: 0.35rem 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--cor-linha);
+  background: var(--cor-fundo-elevado);
+  color: var(--cor-texto);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: border-color 0.15s, background 0.15s;
+}
+.variante-btn:hover { border-color: var(--cor-acento); }
+.variante-btn.ativo {
+  border-color: var(--cor-acento);
+  background: var(--cor-acento);
+  color: var(--cor-acento-texto);
 }
 
 /* Cartões de specs (Garantia, Aquecimento, ...) */

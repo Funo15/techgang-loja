@@ -14,7 +14,7 @@ const router = express.Router();
 const CAMPOS_PUBLICOS = `
   id, nome, slug, descricao, preco, preco_promo, categoria,
   imagens, destaque, tempo_envio_dias, disponivel,
-  rating, num_avaliacoes, tiktok_views, em_tendencia, cores, specs
+  rating, num_avaliacoes, tiktok_views, em_tendencia, cores, specs, variantes
 `;
 
 // Converte uma row da BD num objeto pronto para o frontend
@@ -24,6 +24,7 @@ function publico(row) {
     imagens: JSON.parse(row.imagens),
     cores: JSON.parse(row.cores),
     specs: JSON.parse(row.specs),
+    variantes: JSON.parse(row.variantes || '[]'),
     disponivel: !!row.disponivel,
     destaque: !!row.destaque,
     em_tendencia: !!row.em_tendencia

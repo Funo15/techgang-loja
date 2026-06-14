@@ -248,13 +248,13 @@ router.post('/encomendas/:numero/teste', (req, res) => {
 // ------------------------------------------------------------
 router.get('/produtos', (req, res) => {
   const rows = db.prepare('SELECT * FROM products ORDER BY ativo DESC, created_at DESC').all();
-  res.json(rows.map(p => ({ ...p, imagens: JSON.parse(p.imagens), cores: JSON.parse(p.cores), specs: JSON.parse(p.specs) })));
+  res.json(rows.map(p => ({ ...p, imagens: JSON.parse(p.imagens), cores: JSON.parse(p.cores), specs: JSON.parse(p.specs), variantes: JSON.parse(p.variantes || '[]') })));
 });
 
 router.get('/produtos/:id', (req, res) => {
   const p = db.prepare('SELECT * FROM products WHERE id = ?').get(Number(req.params.id));
   if (!p) return res.status(404).json({ erro: 'Produto não encontrado' });
-  res.json({ ...p, imagens: JSON.parse(p.imagens), cores: JSON.parse(p.cores), specs: JSON.parse(p.specs) });
+  res.json({ ...p, imagens: JSON.parse(p.imagens), cores: JSON.parse(p.cores), specs: JSON.parse(p.specs), variantes: JSON.parse(p.variantes || '[]') });
 });
 
 // Validação dos dados de produto (criar e editar usam a mesma)
@@ -272,7 +272,7 @@ function validarProduto(b) {
     const custo = Number(b.custo_fornecedor);
     if (!Number.isInteger(custo) || custo < 0) erros.custo_fornecedor = 'Custo em cêntimos (inteiro ≥ 0).';
   }
-  for (const campo of ['cores', 'specs', 'imagens']) {
+  for (const campo of ['cores', 'specs', 'imagens', 'variantes']) {
     if (b[campo] != null && !Array.isArray(b[campo])) erros[campo] = 'Formato inválido.';
   }
   return erros;
@@ -310,7 +310,8 @@ function camposProduto(b, slug) {
     tiktok_views: String(b.tiktok_views || '').slice(0, 20) || null,
     em_tendencia: b.em_tendencia ? 1 : 0,
     cores: JSON.stringify(b.cores || []),
-    specs: JSON.stringify(b.specs || [])
+    specs: JSON.stringify(b.specs || []),
+    variantes: JSON.stringify(b.variantes || [])
   };
 }
 
@@ -321,10 +322,10 @@ router.post('/produtos', (req, res) => {
   const r = db.prepare(`
     INSERT INTO products (nome, slug, descricao, preco, preco_promo, categoria, imagens, ativo, destaque,
       fornecedor, fornecedor_url, fornecedor_product_id, custo_fornecedor, tempo_envio_dias, disponivel,
-      rating, num_avaliacoes, tiktok_views, em_tendencia, cores, specs)
+      rating, num_avaliacoes, tiktok_views, em_tendencia, cores, specs, variantes)
     VALUES (@nome, @slug, @descricao, @preco, @preco_promo, @categoria, @imagens, 1, @destaque,
       @fornecedor, @fornecedor_url, @fornecedor_product_id, @custo_fornecedor, @tempo_envio_dias, @disponivel,
-      @rating, @num_avaliacoes, @tiktok_views, @em_tendencia, @cores, @specs)
+      @rating, @num_avaliacoes, @tiktok_views, @em_tendencia, @cores, @specs, @variantes)
   `).run(c);
   res.json({ ok: true, id: r.lastInsertRowid, slug: c.slug });
 });
@@ -342,7 +343,7 @@ router.put('/produtos/:id', (req, res) => {
       fornecedor_url=@fornecedor_url, fornecedor_product_id=@fornecedor_product_id,
       custo_fornecedor=@custo_fornecedor, tempo_envio_dias=@tempo_envio_dias, disponivel=@disponivel,
       rating=@rating, num_avaliacoes=@num_avaliacoes, tiktok_views=@tiktok_views,
-      em_tendencia=@em_tendencia, cores=@cores, specs=@specs
+      em_tendencia=@em_tendencia, cores=@cores, specs=@specs, variantes=@variantes
     WHERE id = @id
   `).run({ ...c, id });
   res.json({ ok: true, slug: c.slug });
@@ -418,7 +419,7 @@ function slugificar(str) {
 }
 
 router.post('/importar-produto', async (req, res) => {
-  const { nome, descricao, preco, preco_promo, categoria, cores, imagens_urls, specs,
+  const { nome, descricao, preco, preco_promo, categoria, cores, variantes, imagens_urls, specs,
     fornecedor_url, fornecedor_product_id, custo_fornecedor, tempo_envio_dias,
     rating, num_avaliacoes, destaque } = req.body || {};
 
@@ -449,8 +450,8 @@ router.post('/importar-produto', async (req, res) => {
     INSERT INTO products
       (nome, slug, descricao, preco, preco_promo, categoria, imagens, ativo, destaque,
        fornecedor, fornecedor_url, fornecedor_product_id, custo_fornecedor,
-       tempo_envio_dias, disponivel, rating, num_avaliacoes, cores, specs)
-    VALUES (?,?,?,?,?,?,?,1,?,  'AliExpress',?,?,?,  ?,1,?,?,?,?)
+       tempo_envio_dias, disponivel, rating, num_avaliacoes, cores, specs, variantes)
+    VALUES (?,?,?,?,?,?,?,1,?,  'AliExpress',?,?,?,  ?,1,?,?,?,?,?)
   `).run(
     String(nome).slice(0, 200),
     slug,
@@ -467,7 +468,8 @@ router.post('/importar-produto', async (req, res) => {
     Number(rating) || 4.8,
     Number(num_avaliacoes) || 0,
     JSON.stringify(Array.isArray(cores) ? cores : []),
-    JSON.stringify(Array.isArray(specs) ? specs : [])
+    JSON.stringify(Array.isArray(specs) ? specs : []),
+    JSON.stringify(Array.isArray(variantes) ? variantes : [])
   );
 
   res.json({ ok: true, id: r.lastInsertRowid, slug });

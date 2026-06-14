@@ -32,8 +32,9 @@ CREATE TABLE IF NOT EXISTS products (
   num_avaliacoes INTEGER NOT NULL DEFAULT 0,
   tiktok_views TEXT,                        -- ex: "128K" (NULL = não mostra)
   em_tendencia INTEGER NOT NULL DEFAULT 0,  -- boolean — pill "Em tendência"
-  cores TEXT NOT NULL DEFAULT '[]',         -- JSON: [{nome, hex}]
-  specs TEXT NOT NULL DEFAULT '[]'          -- JSON: [{icone, label, valor}] (2 cartões)
+  cores TEXT NOT NULL DEFAULT '[]',         -- JSON: [{nome, hex}] (legado — usar variantes)
+  specs TEXT NOT NULL DEFAULT '[]',         -- JSON: [{icone, label, valor}] (2 cartões)
+  variantes TEXT NOT NULL DEFAULT '[]'      -- JSON: [{titulo, tipo, opcoes:[{nome,hex?}]}]
 );
 
 -- Encomendas

@@ -58,7 +58,12 @@
         <label><input type="checkbox" name="em_tendencia"> Em tendência</label>
       </div>
       <div class="campo">
-        <label>Cores (JSON: [{"nome":"Preto","hex":"#15141A"}])</label>
+        <label>Variantes (JSON) — ex: [{&quot;titulo&quot;:&quot;Cor&quot;,&quot;tipo&quot;:&quot;cor&quot;,&quot;opcoes&quot;:[{&quot;nome&quot;:&quot;Preto&quot;,&quot;hex&quot;:&quot;#15141A&quot;}]},{&quot;titulo&quot;:&quot;Switch&quot;,&quot;tipo&quot;:&quot;texto&quot;,&quot;opcoes&quot;:[{&quot;nome&quot;:&quot;Red axis&quot;}]}]</label>
+        <textarea name="variantes" rows="3" class="mono"></textarea>
+        <small class="adm-erro" data-erro="variantes" hidden></small>
+      </div>
+      <div class="campo">
+        <label>Cores legacy (JSON: [{"nome":"Preto","hex":"#15141A"}]) — usa Variantes acima de preferência</label>
         <textarea name="cores" rows="2" class="mono"></textarea>
         <small class="adm-erro" data-erro="cores" hidden></small>
       </div>

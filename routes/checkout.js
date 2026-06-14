@@ -96,7 +96,7 @@ router.post('/checkout', async (req, res) => {
     itemsValidados.push({
       produto_id: p.id,
       nome: p.nome,
-      cor: typeof item.cor === 'string' ? item.cor.slice(0, 30) : null,
+      variante: typeof item.variante === 'string' ? item.variante.slice(0, 80) : (typeof item.cor === 'string' ? item.cor.slice(0, 30) : null),
       qtd,
       preco_unit: p.preco_promo ?? p.preco
     });

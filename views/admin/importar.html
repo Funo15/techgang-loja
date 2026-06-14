@@ -68,11 +68,15 @@
     </section>
 
     <section class="adm-bloco">
-      <h2>Cores detectadas</h2>
-      <div id="imp-cores-preview" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <h2>Variantes detectadas</h2>
+      <div id="imp-variantes-preview" style="margin-bottom:12px"></div>
       <div class="campo">
-        <label>Cores (podes editar)</label>
-        <textarea id="imp-cores" name="cores" rows="3" class="mono"></textarea>
+        <label>Variantes (JSON — podes editar)</label>
+        <textarea id="imp-variantes" name="variantes" rows="4" class="mono"></textarea>
+        <small style="color:var(--cor-texto-suave)">Formato: [{titulo:"Cor",tipo:"cor",opcoes:[{nome:"Branco",hex:"#fff"}]},{titulo:"Switch",tipo:"texto",opcoes:[{nome:"Red axis"}]}]</small>
+      </div>
+      <div class="campo" style="display:none">
+        <textarea id="imp-cores" name="cores" rows="1" class="mono"></textarea>
       </div>
     </section>
 
@@ -136,18 +140,22 @@
     document.getElementById('imp-preco').placeholder = 'ex: ' + sugestao.toFixed(2);
   }
 
-  // Cores
+  // Variantes
+  var variantes = Array.isArray(d.variantes) ? d.variantes : [];
   var cores = Array.isArray(d.cores) ? d.cores : [];
+  document.getElementById('imp-variantes').value = JSON.stringify(variantes, null, 2);
   document.getElementById('imp-cores').value = JSON.stringify(cores, null, 2);
-  var coresDiv = document.getElementById('imp-cores-preview');
-  cores.forEach(function (c) {
-    var s = document.createElement('span');
-    s.title = c.nome;
-    s.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;border:1px solid var(--cor-linha);font-size:13px';
-    s.innerHTML = '<span style="width:14px;height:14px;border-radius:50%;background:' + c.hex + ';border:1px solid var(--cor-linha)"></span>' + c.nome;
-    coresDiv.appendChild(s);
-  });
-  if (!cores.length) coresDiv.innerHTML = '<p class="adm-ajuda">Nenhuma cor detectada — preenche manualmente no campo JSON abaixo.</p>';
+  var variantesDiv = document.getElementById('imp-variantes-preview');
+  if (variantes.length) {
+    variantesDiv.innerHTML = variantes.map(function(v) {
+      var opcoesTags = v.opcoes.map(function(o) {
+        return '<span style="display:inline-block;padding:3px 10px;border-radius:99px;border:1px solid var(--cor-linha);font-size:13px;margin:2px">' + o.nome + '</span>';
+      }).join('');
+      return '<div style="margin-bottom:10px"><strong style="font-size:13px;text-transform:capitalize">' + v.titulo + '</strong><br>' + opcoesTags + '</div>';
+    }).join('');
+  } else {
+    variantesDiv.innerHTML = '<p class="adm-ajuda">Nenhuma variante detectada — podes preencher manualmente o JSON abaixo.</p>';
+  }
 
   // Imagens
   var imgs = Array.isArray(d.imagens_urls) ? d.imagens_urls : [];
@@ -174,6 +182,9 @@
     btn.textContent = 'A importar...';
     erroEl.hidden = true;
 
+    var variantes;
+    try { variantes = JSON.parse(document.getElementById('imp-variantes').value || '[]'); }
+    catch (_) { variantes = []; }
     var cores;
     try { cores = JSON.parse(document.getElementById('imp-cores').value || '[]'); }
     catch (_) { cores = []; }
@@ -185,6 +196,7 @@
       preco_promo: document.getElementById('imp-preco-promo').value ? Math.round(parseFloat(document.getElementById('imp-preco-promo').value) * 100) : null,
       categoria: document.getElementById('imp-categoria').value.trim(),
       cores: cores,
+      variantes: variantes,
       imagens_urls: JSON.parse(document.getElementById('imp-imagens-urls').value || '[]'),
       rating: parseFloat(document.getElementById('imp-rating').value) || 4.8,
       num_avaliacoes: parseInt(document.getElementById('imp-avaliacoes').value) || 0,

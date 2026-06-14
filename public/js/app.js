@@ -35,7 +35,7 @@
 
   // ============================================================
   // CARRINHO (localStorage)
-  // Cada item é identificado por produto + cor escolhida.
+  // Cada item é identificado por produto + variante escolhida.
   // ============================================================
   function lerCarrinho() {
     try { return JSON.parse(localStorage.getItem(CHAVE_CARRINHO)) || []; }
@@ -49,12 +49,12 @@
     return p.preco_promo ?? p.preco;
   }
   function chaveItem(i) {
-    return `${i.id}|${i.cor || ''}`;
+    return `${i.id}|${i.variante || i.cor || ''}`;
   }
 
-  function adicionarAoCarrinho(produto, qtd, cor) {
+  function adicionarAoCarrinho(produto, qtd, variante) {
     const itens = lerCarrinho();
-    const existente = itens.find(i => chaveItem(i) === `${produto.id}|${cor || ''}`);
+    const existente = itens.find(i => chaveItem(i) === `${produto.id}|${variante || ''}`);
     if (existente) {
       existente.qtd += qtd;
     } else {
@@ -64,7 +64,7 @@
         slug: produto.slug,
         preco: precoEfetivo(produto),
         imagem: produto.imagens[0],
-        cor: cor || null,
+        variante: variante || null,
         qtd
       });
     }
@@ -113,7 +113,7 @@
         <a href="/produto/${i.slug}"><img src="${i.imagem}" alt="${i.nome}" width="84" height="84"></a>
         <div>
           <h4>${i.nome}</h4>
-          ${i.cor ? `<p class="carrinho-item-cor">Cor: ${i.cor}</p>` : ''}
+          ${(i.variante || i.cor) ? `<p class="carrinho-item-cor">${i.variante || i.cor}</p>` : ''}
         </div>
         <button class="carrinho-item-remover" data-acao="remover" aria-label="Remover ${i.nome}">${ICONE_X}</button>
         <div class="carrinho-item-base">
@@ -545,24 +545,49 @@
       fav.querySelector('svg').setAttribute('fill', 'currentColor');
     }
 
-    // Cores (variantes)
-    let corEscolhida = null;
-    if (p.cores.length > 0) {
-      corEscolhida = p.cores[0].nome;
-      const swatches = document.getElementById('cores-swatches');
-      swatches.innerHTML = p.cores.map((c, i) =>
-        `<button class="swatch${i === 0 ? ' ativo' : ''}" style="background:${c.hex}" role="radio" aria-checked="${i === 0}" aria-label="${c.nome}" data-cor="${c.nome}" title="${c.nome}"></button>`
-      ).join('');
-      swatches.addEventListener('click', (e) => {
-        const b = e.target.closest('.swatch');
+    // Variantes (multi-dimensionais) ou cores legacy
+    const variantesAtivas = {};
+    const varDims = p.variantes && p.variantes.length > 0 ? p.variantes : (p.cores && p.cores.length > 0 ? [{ titulo: 'Cor', tipo: 'cor', opcoes: p.cores }] : []);
+
+    if (varDims.length > 0) {
+      const coresEl = document.getElementById('produto-cores');
+      const swatchesEl = document.getElementById('cores-swatches');
+      coresEl.hidden = false;
+
+      swatchesEl.innerHTML = varDims.map((dim, di) => {
+        variantesAtivas[dim.titulo] = dim.opcoes[0]?.nome || '';
+        const opcaoHTML = dim.opcoes.map((op, oi) => {
+          if (dim.tipo === 'cor') {
+            return `<button class="swatch${oi === 0 ? ' ativo' : ''}" style="background:${op.hex || '#888'}" role="radio" aria-checked="${oi === 0}" aria-label="${op.nome}" data-dim="${dim.titulo}" data-val="${op.nome}" title="${op.nome}"></button>`;
+          } else {
+            return `<button class="variante-btn${oi === 0 ? ' ativo' : ''}" role="radio" aria-checked="${oi === 0}" data-dim="${dim.titulo}" data-val="${op.nome}">${op.nome}</button>`;
+          }
+        }).join('');
+        return `<div class="variante-grupo" style="margin-bottom:10px">
+          <span class="rotulo-mini" style="display:block;margin-bottom:6px">${dim.titulo}: <strong id="sel-${di}">${dim.opcoes[0]?.nome || ''}</strong></span>
+          <div role="radiogroup" aria-label="${dim.titulo}" data-grupo="${di}">${opcaoHTML}</div>
+        </div>`;
+      }).join('');
+
+      swatchesEl.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-dim]');
         if (!b) return;
-        corEscolhida = b.dataset.cor;
-        swatches.querySelectorAll('.swatch').forEach(s => {
+        const dim = b.dataset.dim;
+        const val = b.dataset.val;
+        const grupo = b.closest('[role=radiogroup]');
+        grupo.querySelectorAll('[data-dim]').forEach(s => {
           s.classList.toggle('ativo', s === b);
           s.setAttribute('aria-checked', s === b ? 'true' : 'false');
         });
+        variantesAtivas[dim] = val;
+        const idx = b.closest('.variante-grupo').querySelector('[role=radiogroup]').dataset.grupo;
+        document.getElementById('sel-' + idx).textContent = val;
       });
-      document.getElementById('produto-cores').hidden = false;
+    }
+
+    function varianteEscolhida() {
+      const vals = Object.values(variantesAtivas);
+      return vals.length ? vals.join(' / ') : null;
     }
 
     // Cartões de specs (Garantia, Aquecimento, ...)
@@ -612,7 +637,7 @@
 
     // Feedback visual ao adicionar: o botão confirma durante 1,2s
     function adicionarComFeedback(botao) {
-      adicionarAoCarrinho(p, qtd, corEscolhida);
+      adicionarAoCarrinho(p, qtd, varianteEscolhida());
       const original = botao.textContent;
       botao.textContent = 'Adicionado ✓';
       botao.disabled = true;
@@ -669,7 +694,7 @@
     document.getElementById('checkout-itens').innerHTML = itens.map(i => `
       <div class="checkout-item">
         <img src="${i.imagem}" alt="" width="48" height="48">
-        <span>${i.nome}${i.cor ? ` <small>· ${i.cor}</small>` : ''} × ${i.qtd}</span>
+        <span>${i.nome}${(i.variante || i.cor) ? ` <small>· ${i.variante || i.cor}</small>` : ''} × ${i.qtd}</span>
         <strong>${formatarPreco(i.preco * i.qtd)}</strong>
       </div>`).join('');
     document.getElementById('checkout-subtotal').textContent = formatarPreco(subtotal);
@@ -733,7 +758,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             cliente: dados,
-            items: lerCarrinho().map(i => ({ id: i.id, qtd: i.qtd, cor: i.cor }))
+            items: lerCarrinho().map(i => ({ id: i.id, qtd: i.qtd, variante: i.variante || i.cor || null }))
           })
         });
         const resposta = await res.json();
@@ -791,7 +816,7 @@
 
     document.getElementById('obrigado-itens').innerHTML = enc.items.map(i => `
       <div class="checkout-item">
-        <span>${i.nome}${i.cor ? ` <small>· ${i.cor}</small>` : ''} × ${i.qtd}</span>
+        <span>${i.nome}${(i.variante || i.cor) ? ` <small>· ${i.variante || i.cor}</small>` : ''} × ${i.qtd}</span>
         <strong>${formatarPreco(i.preco_unit * i.qtd)}</strong>
       </div>`).join('');
     document.getElementById('obrigado-subtotal').textContent = formatarPreco(enc.subtotal);
