@@ -73,6 +73,7 @@ router.post('/login/totp', limitadorAuth, (req, res) => {
   const codigo = String(req.body?.codigo || '').replace(/\s/g, '');
   if (!verificarTotp(codigo)) {
     registarFalhaAdmin(req.ip || '');
+    loginFalhou(req.ip || '', 'admin-totp');
     return res.status(401).json({ erro: 'Código incorreto. Tenta novamente.' });
   }
   limparCookiePreAuth(res);
@@ -92,11 +93,15 @@ router.use(exigirAdmin);
 
 router.get('/', (req, res) => res.send(render('dashboard', { TITULO: `Admin | ${config.nome}`, NONCE: res.locals.nonce })));
 router.get('/encomendas', (req, res) => res.send(render('encomendas', { TITULO: `Encomendas | Admin ${config.nome}`, NONCE: res.locals.nonce })));
-router.get('/encomendas/:numero', (req, res) => res.send(render('encomenda', { TITULO: `${req.params.numero} | Admin ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/encomendas/:numero', (req, res) => {
+  const numero = String(req.params.numero).replace(/[^A-Za-z0-9-]/g, '');
+  res.send(render('encomenda', { TITULO: `${numero} | Admin ${config.nome}`, NONCE: res.locals.nonce }));
+});
 router.get('/produtos', (req, res) => res.send(render('produtos', { TITULO: `Produtos | Admin ${config.nome}`, NONCE: res.locals.nonce })));
 router.get('/produtos/novo', (req, res) => res.send(render('produto-form', { TITULO: `Novo produto | Admin ${config.nome}`, NONCE: res.locals.nonce })));
 router.get('/produtos/:id', (req, res) => res.send(render('produto-form', { TITULO: `Editar produto | Admin ${config.nome}`, NONCE: res.locals.nonce })));
 router.get('/clientes', (req, res) => res.send(render('clientes', { TITULO: `Clientes | Admin ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/importar', (req, res) => res.send(render('importar', { TITULO: `Importar produto | Admin ${config.nome}`, NONCE: res.locals.nonce })));
 
 // Setup 2FA — mostra QR code para configurar Google Authenticator
 router.get('/setup-2fa', async (req, res) => {

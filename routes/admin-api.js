@@ -373,10 +373,103 @@ router.patch('/produtos/:id/toggle', (req, res) => {
 });
 
 // ------------------------------------------------------------
-// UPLOAD DE IMAGENS — multer (memória) + sharp (máx 1200px, q80)
+// IMPORTAR PRODUTO (bookmarklet AliExpress)
 // ------------------------------------------------------------
 const PATHS = require('../lib/paths');
 const PASTA_UPLOADS = PATHS.uploads;
+
+function downloadUrl(url) {
+  const https = require('https');
+  const http = require('http');
+  return new Promise((resolve, reject) => {
+    const mod = url.startsWith('https') ? https : http;
+    mod.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, res => {
+      if (res.statusCode === 301 || res.statusCode === 302) {
+        return downloadUrl(res.headers.location).then(resolve).catch(reject);
+      }
+      if (res.statusCode !== 200) return reject(new Error('HTTP ' + res.statusCode));
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => resolve(Buffer.concat(chunks)));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+function slugificar(str) {
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    .slice(0, 80);
+}
+
+router.post('/importar-produto', async (req, res) => {
+  const { nome, descricao, preco, preco_promo, categoria, cores, imagens_urls, specs,
+    fornecedor_url, fornecedor_product_id, custo_fornecedor, tempo_envio_dias,
+    rating, num_avaliacoes, destaque } = req.body || {};
+
+  if (!nome || !preco) return res.status(400).json({ erro: 'Nome e preço são obrigatórios.' });
+
+  // Descarregar e processar imagens
+  const urls = [];
+  for (const url of (imagens_urls || []).slice(0, 8)) {
+    try {
+      const buf = await downloadUrl(url);
+      const nome_f = `p-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+      await sharp(buf)
+        .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 82 })
+        .toFile(path.join(PASTA_UPLOADS, nome_f));
+      urls.push('/media/' + nome_f);
+    } catch (e) {
+      console.error('[importar] imagem falhou:', e.message);
+    }
+  }
+
+  // Slug único
+  let slug = slugificar(nome);
+  const existe = db.prepare('SELECT id FROM products WHERE slug = ?').get(slug);
+  if (existe) slug = slug + '-' + Date.now().toString(36);
+
+  const r = db.prepare(`
+    INSERT INTO products
+      (nome, slug, descricao, preco, preco_promo, categoria, imagens, ativo, destaque,
+       fornecedor, fornecedor_url, fornecedor_product_id, custo_fornecedor,
+       tempo_envio_dias, disponivel, rating, num_avaliacoes, cores, specs)
+    VALUES (?,?,?,?,?,?,?,1,?,  'AliExpress',?,?,?,  ?,1,?,?,?,?)
+  `).run(
+    String(nome).slice(0, 200),
+    slug,
+    String(descricao || '').slice(0, 2000),
+    Number(preco),
+    preco_promo ? Number(preco_promo) : null,
+    String(categoria || 'Geral').slice(0, 60),
+    JSON.stringify(urls),
+    destaque ? 1 : 0,
+    String(fornecedor_url || '').slice(0, 500),
+    String(fornecedor_product_id || '').slice(0, 100),
+    custo_fornecedor ? Number(custo_fornecedor) : null,
+    String(tempo_envio_dias || '8-15').slice(0, 20),
+    Number(rating) || 4.8,
+    Number(num_avaliacoes) || 0,
+    JSON.stringify(Array.isArray(cores) ? cores : []),
+    JSON.stringify(Array.isArray(specs) ? specs : [])
+  );
+
+  res.json({ ok: true, id: r.lastInsertRowid, slug });
+});
+
+// ------------------------------------------------------------
+// UPLOAD DE IMAGENS — multer (memória) + sharp (máx 1200px, q80)
+// ------------------------------------------------------------
+
+const MAGIC = {
+  'image/jpeg': (b) => b[0] === 0xFF && b[1] === 0xD8,
+  'image/png':  (b) => b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47,
+  'image/gif':  (b) => b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x38,
+  'image/webp': (b) => b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50,
+  'image/avif': (b) => b[4] === 0x66 && b[5] === 0x74 && b[6] === 0x79 && b[7] === 0x70, // ftyp box
+};
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -388,6 +481,12 @@ const upload = multer({
 
 router.post('/upload', upload.array('imagens', 6), async (req, res) => {
   if (!req.files?.length) return res.status(400).json({ erro: 'Nenhuma imagem válida recebida.' });
+  // Validar magic bytes reais — o fileFilter do multer só verifica o Content-Type do header
+  const invalidas = req.files.filter(f => {
+    const check = MAGIC[f.mimetype];
+    return !check || f.buffer.length < 12 || !check(f.buffer);
+  });
+  if (invalidas.length > 0) return res.status(400).json({ erro: 'Uma ou mais imagens são inválidas.' });
   const urls = [];
   for (const f of req.files) {
     const nome = `p-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;

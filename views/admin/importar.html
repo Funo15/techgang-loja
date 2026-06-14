@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:admin-head}}
+</head>
+<body data-adm-page="importar">
+{{include:admin-nav}}
+<main class="adm-main adm-main-estreito">
+  <p class="adm-voltar"><a href="/funitocorp/produtos">← Produtos</a></p>
+  <h1>Importar produto</h1>
+  <p id="imp-aviso" style="color:var(--cor-perigo);font-weight:600" hidden>Não foi possível ler os dados do produto. Preenche manualmente.</p>
+
+  <form id="form-importar" class="adm-form" novalidate>
+
+    <section class="adm-bloco">
+      <h2>Imagens do AliExpress</h2>
+      <div id="imp-previews" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
+      <p class="adm-ajuda">As imagens são descarregadas e convertidas para WebP ao importar.</p>
+      <input type="hidden" id="imp-imagens-urls">
+    </section>
+
+    <section class="adm-bloco">
+      <h2>Informação da loja</h2>
+      <div class="campo">
+        <label>Nome do produto</label>
+        <input id="imp-nome" name="nome" type="text" required>
+      </div>
+      <div class="campo">
+        <label>Descrição (escreve em português para os teus clientes)</label>
+        <textarea id="imp-descricao" name="descricao" rows="4" placeholder="Descreve o produto de forma apelativa..."></textarea>
+      </div>
+      <div class="campo-linha-3">
+        <div class="campo">
+          <label>Preço de venda (cêntimos)</label>
+          <input id="imp-preco" name="preco" type="number" min="1" step="1" placeholder="5990" required>
+          <small style="color:var(--cor-texto-suave)">ex: 5990 = €59,90</small>
+        </div>
+        <div class="campo">
+          <label>Preço riscado (cêntimos)</label>
+          <input id="imp-preco-promo" name="preco_promo" type="number" min="1" step="1" placeholder="vazio = sem risco">
+        </div>
+        <div class="campo">
+          <label>Categoria</label>
+          <input id="imp-categoria" name="categoria" type="text" placeholder="ex: Teclados" required>
+        </div>
+      </div>
+      <div class="campo-linha-3">
+        <div class="campo">
+          <label>Rating</label>
+          <input id="imp-rating" name="rating" type="number" min="0" max="5" step="0.1">
+        </div>
+        <div class="campo">
+          <label>Nº avaliações</label>
+          <input id="imp-avaliacoes" name="num_avaliacoes" type="number" min="0" step="1">
+        </div>
+        <div class="campo">
+          <label>Tempo de envio (dias)</label>
+          <input id="imp-envio" name="tempo_envio_dias" type="text" placeholder="8-12">
+        </div>
+      </div>
+      <div class="adm-toggles">
+        <label><input type="checkbox" id="imp-destaque"> Destaque na home</label>
+      </div>
+    </section>
+
+    <section class="adm-bloco">
+      <h2>Cores detectadas</h2>
+      <div id="imp-cores-preview" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <div class="campo">
+        <label>Cores (podes editar)</label>
+        <textarea id="imp-cores" name="cores" rows="3" class="mono"></textarea>
+      </div>
+    </section>
+
+    <section class="adm-bloco">
+      <h2>Fornecedor (AliExpress)</h2>
+      <div class="campo-linha">
+        <div class="campo">
+          <label>Link AliExpress</label>
+          <input id="imp-url" name="fornecedor_url" type="url">
+        </div>
+        <div class="campo">
+          <label>ID do produto</label>
+          <input id="imp-pid" name="fornecedor_product_id" type="text">
+        </div>
+      </div>
+      <div class="campo-linha">
+        <div class="campo">
+          <label>Custo AliExpress (cêntimos)</label>
+          <input id="imp-custo" name="custo_fornecedor" type="number" min="0" step="1" placeholder="3200">
+          <small style="color:var(--cor-texto-suave)">preço que pagas ao fornecedor</small>
+        </div>
+      </div>
+    </section>
+
+    <p class="adm-erro" id="imp-erro" hidden></p>
+    <button type="submit" class="adm-btn adm-btn-primario" id="imp-btn">⬇️ Importar produto</button>
+  </form>
+</main>
+
+<script nonce="{{NONCE}}">
+(function () {
+  // Ler dados do hash da URL (colocados pelo bookmarklet)
+  var hash = location.hash.slice(1);
+  var d = {};
+  if (hash) {
+    try { d = JSON.parse(decodeURIComponent(escape(atob(hash)))); }
+    catch (e) { document.getElementById('imp-aviso').hidden = false; }
+  }
+
+  // Preencher campos
+  if (d.nome) document.getElementById('imp-nome').value = d.nome;
+  if (d.rating) document.getElementById('imp-rating').value = d.rating;
+  if (d.num_avaliacoes) document.getElementById('imp-avaliacoes').value = d.num_avaliacoes;
+  if (d.fornecedor_url) document.getElementById('imp-url').value = d.fornecedor_url;
+  if (d.fornecedor_product_id) document.getElementById('imp-pid').value = d.fornecedor_product_id;
+  if (d.custo_aliexpress) document.getElementById('imp-custo').value = d.custo_aliexpress;
+  document.getElementById('imp-envio').value = d.tempo_envio_dias || '8-15';
+
+  // Cores
+  var cores = Array.isArray(d.cores) ? d.cores : [];
+  document.getElementById('imp-cores').value = JSON.stringify(cores, null, 2);
+  var coresDiv = document.getElementById('imp-cores-preview');
+  cores.forEach(function (c) {
+    var s = document.createElement('span');
+    s.title = c.nome;
+    s.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;border:1px solid var(--cor-linha);font-size:13px';
+    s.innerHTML = '<span style="width:14px;height:14px;border-radius:50%;background:' + c.hex + ';border:1px solid var(--cor-linha)"></span>' + c.nome;
+    coresDiv.appendChild(s);
+  });
+  if (!cores.length) coresDiv.innerHTML = '<p class="adm-ajuda">Nenhuma cor detectada — preenche manualmente no campo JSON abaixo.</p>';
+
+  // Imagens
+  var imgs = Array.isArray(d.imagens_urls) ? d.imagens_urls : [];
+  document.getElementById('imp-imagens-urls').value = JSON.stringify(imgs);
+  var prevDiv = document.getElementById('imp-previews');
+  if (imgs.length) {
+    imgs.forEach(function (url) {
+      var img = document.createElement('img');
+      img.src = url;
+      img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--cor-linha)';
+      img.onerror = function () { this.style.display = 'none'; };
+      prevDiv.appendChild(img);
+    });
+  } else {
+    prevDiv.innerHTML = '<p class="adm-ajuda">Sem imagens detectadas.</p>';
+  }
+
+  // Sugestão de preço baseada no custo AliExpress (3x)
+  if (d.custo_aliexpress && !d.preco) {
+    document.getElementById('imp-preco').placeholder = 'Sugestão: ' + (d.custo_aliexpress * 3);
+  }
+
+  // Submit
+  document.getElementById('form-importar').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('imp-btn');
+    var erroEl = document.getElementById('imp-erro');
+    btn.disabled = true;
+    btn.textContent = 'A importar...';
+    erroEl.hidden = true;
+
+    var cores;
+    try { cores = JSON.parse(document.getElementById('imp-cores').value || '[]'); }
+    catch (_) { cores = []; }
+
+    var payload = {
+      nome: document.getElementById('imp-nome').value.trim(),
+      descricao: document.getElementById('imp-descricao').value.trim(),
+      preco: parseInt(document.getElementById('imp-preco').value) || 0,
+      preco_promo: parseInt(document.getElementById('imp-preco-promo').value) || null,
+      categoria: document.getElementById('imp-categoria').value.trim(),
+      cores: cores,
+      imagens_urls: JSON.parse(document.getElementById('imp-imagens-urls').value || '[]'),
+      rating: parseFloat(document.getElementById('imp-rating').value) || 4.8,
+      num_avaliacoes: parseInt(document.getElementById('imp-avaliacoes').value) || 0,
+      tempo_envio_dias: document.getElementById('imp-envio').value.trim() || '8-15',
+      fornecedor_url: document.getElementById('imp-url').value.trim(),
+      fornecedor_product_id: document.getElementById('imp-pid').value.trim(),
+      custo_fornecedor: parseInt(document.getElementById('imp-custo').value) || null,
+      destaque: document.getElementById('imp-destaque').checked ? 1 : 0
+    };
+
+    try {
+      var r = await fetch('/api/admin/importar-produto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      var data = await r.json();
+      if (!r.ok) throw new Error(data.erro || 'Erro desconhecido');
+      window.location.href = '/funitocorp/produtos/' + data.id;
+    } catch (err) {
+      erroEl.textContent = err.message;
+      erroEl.hidden = false;
+      btn.disabled = false;
+      btn.textContent = '⬇️ Importar produto';
+    }
+  });
+})();
+</script>
+</body>
+</html>

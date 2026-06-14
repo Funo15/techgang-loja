@@ -78,6 +78,9 @@ router.post('/checkout', async (req, res) => {
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ erro: 'O carrinho está vazio.' });
   }
+  if (items.length > 20) {
+    return res.status(400).json({ erro: 'Demasiados artigos no carrinho.' });
+  }
   const buscarProduto = db.prepare('SELECT * FROM products WHERE id = ? AND ativo = 1');
   const itemsValidados = [];
   for (const item of items) {
