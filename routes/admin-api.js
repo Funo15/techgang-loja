@@ -278,6 +278,14 @@ function validarProduto(b) {
   return erros;
 }
 
+// Só aceita URLs http(s) — bloqueia javascript:/data: que seriam renderizadas
+// como links clicáveis no admin (self-XSS).
+function urlSegura(valor, maxLen = 300) {
+  const s = String(valor || '').trim().slice(0, maxLen);
+  if (!s) return null;
+  return /^https?:\/\//i.test(s) ? s : null;
+}
+
 function gerarSlug(nome, idAtual = null) {
   const base = String(nome).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'produto';
@@ -300,7 +308,7 @@ function camposProduto(b, slug) {
     imagens: JSON.stringify(b.imagens || []),
     destaque: b.destaque ? 1 : 0,
     fornecedor: String(b.fornecedor || '').slice(0, 60) || null,
-    fornecedor_url: String(b.fornecedor_url || '').slice(0, 300) || null,
+    fornecedor_url: urlSegura(b.fornecedor_url, 300),
     fornecedor_product_id: String(b.fornecedor_product_id || '').slice(0, 80) || null,
     custo_fornecedor: b.custo_fornecedor != null && b.custo_fornecedor !== '' ? Number(b.custo_fornecedor) : null,
     tempo_envio_dias: String(b.tempo_envio_dias || '8-12').slice(0, 20),
@@ -448,6 +456,26 @@ router.post('/importar-produto', async (req, res) => {
 
   if (!nome || !preco) return res.status(400).json({ erro: 'Nome e preço são obrigatórios.' });
 
+  // Validação numérica (cêntimos) — não confiar nos valores enviados
+  const precoInt = Number(preco);
+  if (!Number.isInteger(precoInt) || precoInt <= 0) {
+    return res.status(400).json({ erro: 'Preço inválido (cêntimos, inteiro > 0).' });
+  }
+  let promoInt = null;
+  if (preco_promo != null && preco_promo !== '') {
+    promoInt = Number(preco_promo);
+    if (!Number.isInteger(promoInt) || promoInt <= 0 || promoInt >= precoInt) {
+      return res.status(400).json({ erro: 'Promo tem de ser > 0 e menor que o preço.' });
+    }
+  }
+  let custoInt = null;
+  if (custo_fornecedor != null && custo_fornecedor !== '') {
+    custoInt = Number(custo_fornecedor);
+    if (!Number.isInteger(custoInt) || custoInt < 0) {
+      return res.status(400).json({ erro: 'Custo inválido (cêntimos, inteiro ≥ 0).' });
+    }
+  }
+
   // Descarregar e processar imagens
   const urls = [];
   for (const url of (imagens_urls || []).slice(0, 8)) {
@@ -479,17 +507,17 @@ router.post('/importar-produto', async (req, res) => {
     String(nome).slice(0, 200),
     slug,
     String(descricao || '').slice(0, 2000),
-    Number(preco),
-    preco_promo ? Number(preco_promo) : null,
+    precoInt,
+    promoInt,
     String(categoria || 'Geral').slice(0, 60),
     JSON.stringify(urls),
     destaque ? 1 : 0,
-    String(fornecedor_url || '').slice(0, 500),
+    urlSegura(fornecedor_url, 500),
     String(fornecedor_product_id || '').slice(0, 100),
-    custo_fornecedor ? Number(custo_fornecedor) : null,
+    custoInt,
     String(tempo_envio_dias || '8-15').slice(0, 20),
-    Number(rating) || 4.8,
-    Number(num_avaliacoes) || 0,
+    Math.min(5, Math.max(0, Number(rating) || 4.8)),
+    Math.max(0, parseInt(num_avaliacoes, 10) || 0),
     JSON.stringify(Array.isArray(cores) ? cores : []),
     JSON.stringify(Array.isArray(specs) ? specs : []),
     JSON.stringify(Array.isArray(variantes) ? variantes : [])

@@ -74,8 +74,14 @@ router.get('/encomendas', auth.exigirCliente, (req, res) => {
 });
 
 router.get('/encomendas/:numero', auth.exigirCliente, (req, res) => {
-  const enc = db.prepare('SELECT * FROM orders WHERE numero_encomenda = ? AND email = ?')
-    .get(req.params.numero, req.cliente.email);
+  // Só campos visíveis ao cliente — nunca notas_internas, ip, user_agent,
+  // fornecedor_order_id nem a flag de teste.
+  const enc = db.prepare(`
+    SELECT numero_encomenda, nome_cliente, email, telefone, morada, codigo_postal,
+           cidade, pais, items, subtotal, portes, total, metodo_pagamento,
+           estado_pagamento, estado_fulfillment, tracking_number, tracking_url, created_at
+    FROM orders WHERE numero_encomenda = ? AND email = ?
+  `).get(req.params.numero, req.cliente.email);
   if (!enc) return res.status(404).json({ erro: 'Encomenda não encontrada.' });
   res.json(enc);
 });
