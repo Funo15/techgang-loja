@@ -9,6 +9,11 @@
   const LOJA = window.LOJA;
   const CHAVE_CARRINHO = 'tg_carrinho';
 
+  // ---------- Escape HTML ----------
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   // ---------- Formatação de preços ----------
   // A BD guarda cêntimos; aqui formatamos para "€24,99"
   function formatarPreco(centimos) {
@@ -110,12 +115,12 @@
   function itemCarrinhoHTML(i) {
     return `
       <div class="carrinho-item" data-chave="${chaveItem(i)}">
-        <a href="/produto/${i.slug}"><img src="${i.imagem}" alt="${i.nome}" width="84" height="84"></a>
+        <a href="/produto/${esc(i.slug)}"><img src="${esc(i.imagem)}" alt="${esc(i.nome)}" width="84" height="84"></a>
         <div>
-          <h4>${i.nome}</h4>
-          ${(i.variante || i.cor) ? `<p class="carrinho-item-cor">${i.variante || i.cor}</p>` : ''}
+          <h4>${esc(i.nome)}</h4>
+          ${(i.variante || i.cor) ? `<p class="carrinho-item-cor">${esc(i.variante || i.cor)}</p>` : ''}
         </div>
-        <button class="carrinho-item-remover" data-acao="remover" aria-label="Remover ${i.nome}">${ICONE_X}</button>
+        <button class="carrinho-item-remover" data-acao="remover" aria-label="Remover ${esc(i.nome)}">${ICONE_X}</button>
         <div class="carrinho-item-base">
           <div class="carrinho-item-qtd">
             <button data-acao="menos" aria-label="Diminuir">&minus;</button>
@@ -393,7 +398,7 @@
     const desconto = percentDesconto(p);
     const fav = lerFavoritos().includes(p.id);
     return `
-      <a href="/produto/${p.slug}" class="card-produto">
+      <a href="/produto/${esc(p.slug)}" class="card-produto">
         <div class="card-media">
           ${desconto ? `<span class="badge-promo">-${desconto}%</span>` : ''}
           <button class="btn-favorito${fav ? ' ativo' : ''}" data-id="${p.id}" aria-label="Adicionar aos favoritos">
@@ -401,9 +406,9 @@
               <path d="M12 20s-7-4.6-9.3-8.6C1 8.4 3 5 6.4 5c2 0 3.6 1.1 4.6 2.7H12c1-1.6 2.6-2.7 4.6-2.7C20 5 22 8.4 20.3 11.4 18 15.4 12 20 12 20z"/>
             </svg>
           </button>
-          <img src="${p.imagens[0]}" alt="${p.nome}" loading="lazy" width="900" height="900">
+          <img src="${esc(p.imagens[0])}" alt="${esc(p.nome)}" loading="lazy" width="900" height="900">
         </div>
-        <h3>${p.nome}</h3>
+        <h3>${esc(p.nome)}</h3>
         <div class="card-preco">
           <span class="preco-display preco-atual">${formatarPreco(precoEfetivo(p))}</span>
           ${desconto ? `<span class="preco-antigo">${formatarPreco(p.preco)}</span>` : ''}
@@ -558,14 +563,15 @@
         variantesAtivas[dim.titulo] = dim.opcoes[0]?.nome || '';
         const opcaoHTML = dim.opcoes.map((op, oi) => {
           if (dim.tipo === 'cor') {
-            return `<button class="swatch${oi === 0 ? ' ativo' : ''}" style="background:${op.hex || '#888'}" role="radio" aria-checked="${oi === 0}" aria-label="${op.nome}" data-dim="${dim.titulo}" data-val="${op.nome}" title="${op.nome}"></button>`;
+            const hex = /^#[0-9a-fA-F]{3,6}$/.test(op.hex || '') ? op.hex : '#888888';
+            return `<button class="swatch${oi === 0 ? ' ativo' : ''}" style="background:${hex}" role="radio" aria-checked="${oi === 0}" aria-label="${esc(op.nome)}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}" title="${esc(op.nome)}"></button>`;
           } else {
-            return `<button class="variante-btn${oi === 0 ? ' ativo' : ''}" role="radio" aria-checked="${oi === 0}" data-dim="${dim.titulo}" data-val="${op.nome}">${op.nome}</button>`;
+            return `<button class="variante-btn${oi === 0 ? ' ativo' : ''}" role="radio" aria-checked="${oi === 0}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}">${esc(op.nome)}</button>`;
           }
         }).join('');
         return `<div class="variante-grupo" style="margin-bottom:10px">
-          <span class="rotulo-mini" style="display:block;margin-bottom:6px">${dim.titulo}: <strong id="sel-${di}">${dim.opcoes[0]?.nome || ''}</strong></span>
-          <div role="radiogroup" aria-label="${dim.titulo}" data-grupo="${di}">${opcaoHTML}</div>
+          <span class="rotulo-mini" style="display:block;margin-bottom:6px">${esc(dim.titulo)}: <strong id="sel-${di}">${esc(dim.opcoes[0]?.nome || '')}</strong></span>
+          <div role="radiogroup" aria-label="${esc(dim.titulo)}" data-grupo="${di}">${opcaoHTML}</div>
         </div>`;
       }).join('');
 
@@ -693,8 +699,8 @@
     const envio = envioGratis ? 0 : LOJA.portes;
     document.getElementById('checkout-itens').innerHTML = itens.map(i => `
       <div class="checkout-item">
-        <img src="${i.imagem}" alt="" width="48" height="48">
-        <span>${i.nome}${(i.variante || i.cor) ? ` <small>· ${i.variante || i.cor}</small>` : ''} × ${i.qtd}</span>
+        <img src="${esc(i.imagem)}" alt="" width="48" height="48">
+        <span>${esc(i.nome)}${(i.variante || i.cor) ? ` <small>· ${esc(i.variante || i.cor)}</small>` : ''} × ${i.qtd}</span>
         <strong>${formatarPreco(i.preco * i.qtd)}</strong>
       </div>`).join('');
     document.getElementById('checkout-subtotal').textContent = formatarPreco(subtotal);
@@ -816,7 +822,7 @@
 
     document.getElementById('obrigado-itens').innerHTML = enc.items.map(i => `
       <div class="checkout-item">
-        <span>${i.nome}${(i.variante || i.cor) ? ` <small>· ${i.variante || i.cor}</small>` : ''} × ${i.qtd}</span>
+        <span>${esc(i.nome)}${(i.variante || i.cor) ? ` <small>· ${esc(i.variante || i.cor)}</small>` : ''} × ${i.qtd}</span>
         <strong>${formatarPreco(i.preco_unit * i.qtd)}</strong>
       </div>`).join('');
     document.getElementById('obrigado-subtotal').textContent = formatarPreco(enc.subtotal);

@@ -386,11 +386,27 @@ router.delete('/produtos/:id', (req, res) => {
 const PATHS = require('../lib/paths');
 const PASTA_UPLOADS = PATHS.uploads;
 
+const DOMINIOS_IMAGEM_PERMITIDOS = [
+  'ae01.alicdn.com',
+  'ae-pic-a1.aliexpress-media.com',
+  'ae-pic-b1.aliexpress-media.com',
+  'ae-pic-c1.aliexpress-media.com',
+  'img.alicdn.com',
+  'cbu01.alicdn.com',
+];
+
+function urlPermitida(url) {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== 'https:') return false;
+    return DOMINIOS_IMAGEM_PERMITIDOS.some(d => u.hostname === d || u.hostname.endsWith('.' + d));
+  } catch { return false; }
+}
+
 function downloadUrl(url, tentativa = 0) {
+  if (!urlPermitida(url)) return Promise.reject(new Error('Domínio não permitido: ' + url));
   const https = require('https');
-  const http = require('http');
   return new Promise((resolve, reject) => {
-    const mod = url.startsWith('https') ? https : http;
     const opts = {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -398,13 +414,20 @@ function downloadUrl(url, tentativa = 0) {
         'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
       }
     };
-    mod.get(url, opts, res => {
-      if (res.statusCode === 301 || res.statusCode === 302) {
-        return downloadUrl(res.headers.location, tentativa).then(resolve).catch(reject);
+    https.get(url, opts, res => {
+      if ((res.statusCode === 301 || res.statusCode === 302) && tentativa < 2) {
+        const loc = res.headers.location;
+        if (!urlPermitida(loc)) return reject(new Error('Redirect para domínio não permitido'));
+        return downloadUrl(loc, tentativa + 1).then(resolve).catch(reject);
       }
       if (res.statusCode !== 200) return reject(new Error('HTTP ' + res.statusCode));
       const chunks = [];
-      res.on('data', c => chunks.push(c));
+      let total = 0;
+      res.on('data', c => {
+        total += c.length;
+        if (total > 15 * 1024 * 1024) { res.destroy(); return reject(new Error('Imagem demasiado grande')); }
+        chunks.push(c);
+      });
       res.on('end', () => resolve(Buffer.concat(chunks)));
       res.on('error', reject);
     }).on('error', reject);
