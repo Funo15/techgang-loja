@@ -378,14 +378,21 @@ router.patch('/produtos/:id/toggle', (req, res) => {
 const PATHS = require('../lib/paths');
 const PASTA_UPLOADS = PATHS.uploads;
 
-function downloadUrl(url) {
+function downloadUrl(url, tentativa = 0) {
   const https = require('https');
   const http = require('http');
   return new Promise((resolve, reject) => {
     const mod = url.startsWith('https') ? https : http;
-    mod.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, res => {
+    const opts = {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Referer': 'https://pt.aliexpress.com/',
+        'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+      }
+    };
+    mod.get(url, opts, res => {
       if (res.statusCode === 301 || res.statusCode === 302) {
-        return downloadUrl(res.headers.location).then(resolve).catch(reject);
+        return downloadUrl(res.headers.location, tentativa).then(resolve).catch(reject);
       }
       if (res.statusCode !== 200) return reject(new Error('HTTP ' + res.statusCode));
       const chunks = [];

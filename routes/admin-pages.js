@@ -102,6 +102,7 @@ router.get('/produtos/novo', (req, res) => res.send(render('produto-form', { TIT
 router.get('/produtos/:id', (req, res) => res.send(render('produto-form', { TITULO: `Editar produto | Admin ${config.nome}`, NONCE: res.locals.nonce })));
 router.get('/clientes', (req, res) => res.send(render('clientes', { TITULO: `Clientes | Admin ${config.nome}`, NONCE: res.locals.nonce })));
 router.get('/importar', (req, res) => res.send(render('importar', { TITULO: `Importar produto | Admin ${config.nome}`, NONCE: res.locals.nonce })));
+router.get('/bookmarklet', (req, res) => res.send(render('bookmarklet', { TITULO: `Setup Importar | Admin ${config.nome}`, NONCE: res.locals.nonce })));
 
 // Setup 2FA — mostra QR code para configurar Google Authenticator
 router.get('/setup-2fa', async (req, res) => {

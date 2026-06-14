@@ -31,13 +31,12 @@
       </div>
       <div class="campo-linha-3">
         <div class="campo">
-          <label>Preço de venda (cêntimos)</label>
-          <input id="imp-preco" name="preco" type="number" min="1" step="1" placeholder="5990" required>
-          <small style="color:var(--cor-texto-suave)">ex: 5990 = €59,90</small>
+          <label>Preço de venda (€)</label>
+          <input id="imp-preco" name="preco" type="number" min="0.01" step="0.01" placeholder="59.90" required>
         </div>
         <div class="campo">
-          <label>Preço riscado (cêntimos)</label>
-          <input id="imp-preco-promo" name="preco_promo" type="number" min="1" step="1" placeholder="vazio = sem risco">
+          <label>Preço riscado (€)</label>
+          <input id="imp-preco-promo" name="preco_promo" type="number" min="0.01" step="0.01" placeholder="vazio = sem risco">
         </div>
         <div class="campo">
           <label>Categoria</label>
@@ -86,8 +85,8 @@
       </div>
       <div class="campo-linha">
         <div class="campo">
-          <label>Custo AliExpress (cêntimos)</label>
-          <input id="imp-custo" name="custo_fornecedor" type="number" min="0" step="1" placeholder="3200">
+          <label>Custo AliExpress (€)</label>
+          <input id="imp-custo" name="custo_fornecedor" type="number" min="0" step="0.01" placeholder="32.00">
           <small style="color:var(--cor-texto-suave)">preço que pagas ao fornecedor</small>
         </div>
       </div>
@@ -167,8 +166,8 @@
     var payload = {
       nome: document.getElementById('imp-nome').value.trim(),
       descricao: document.getElementById('imp-descricao').value.trim(),
-      preco: parseInt(document.getElementById('imp-preco').value) || 0,
-      preco_promo: parseInt(document.getElementById('imp-preco-promo').value) || null,
+      preco: Math.round((parseFloat(document.getElementById('imp-preco').value) || 0) * 100),
+      preco_promo: document.getElementById('imp-preco-promo').value ? Math.round(parseFloat(document.getElementById('imp-preco-promo').value) * 100) : null,
       categoria: document.getElementById('imp-categoria').value.trim(),
       cores: cores,
       imagens_urls: JSON.parse(document.getElementById('imp-imagens-urls').value || '[]'),
@@ -177,7 +176,7 @@
       tempo_envio_dias: document.getElementById('imp-envio').value.trim() || '8-15',
       fornecedor_url: document.getElementById('imp-url').value.trim(),
       fornecedor_product_id: document.getElementById('imp-pid').value.trim(),
-      custo_fornecedor: parseInt(document.getElementById('imp-custo').value) || null,
+      custo_fornecedor: document.getElementById('imp-custo').value ? Math.round(parseFloat(document.getElementById('imp-custo').value) * 100) : null,
       destaque: document.getElementById('imp-destaque').checked ? 1 : 0
     };
 

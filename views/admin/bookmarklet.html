@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+{{include:admin-head}}
+<style>
+.bm-caixa { background: #f5f3ff; border-radius: 16px; padding: 32px; text-align: center; margin: 32px 0; }
+.bm-link { display: inline-block; background: var(--cor-acento); color: #fff; padding: 16px 28px; border-radius: 12px; text-decoration: none; font-size: 17px; font-weight: 700; cursor: grab; user-select: none; }
+.bm-link:hover { opacity: .9; }
+.bm-passos { counter-reset: passo; list-style: none; padding: 0; margin: 24px 0 0; text-align: left; }
+.bm-passos li { counter-increment: passo; display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; font-size: 15px; }
+.bm-passos li::before { content: counter(passo); background: var(--cor-acento); color: #fff; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+.bm-nota { background: #fff3cd; border-radius: 8px; padding: 12px 16px; font-size: 14px; margin-top: 16px; }
+</style>
+</head>
+<body data-adm-page="bookmarklet">
+{{include:admin-nav}}
+<main class="adm-main adm-main-estreito">
+  <h1>⬇️ Importar do AliExpress</h1>
+  <p>Configura o atalho uma vez e depois importas qualquer produto em segundos.</p>
+
+  <div class="bm-caixa">
+    <p style="margin:0 0 16px;font-weight:600">Arrasta este botão para a barra de favoritos:</p>
+    <a class="bm-link" id="bm-link" href="#">⬇️ Importar para TechGang</a>
+    <p style="margin:12px 0 0;font-size:13px;color:var(--cor-texto-suave)">Arrasta ↑ para a barra de favoritos do browser</p>
+  </div>
+
+  <ol class="bm-passos">
+    <li>Arrasta o botão roxo para a barra de favoritos (aparece em cima no browser)</li>
+    <li>Abre qualquer produto no AliExpress</li>
+    <li>Clica no favorito <strong>"Importar para TechGang"</strong></li>
+    <li>Abre esta página com os dados pré-preenchidos</li>
+    <li>Define o preço de venda e clica <strong>Importar</strong></li>
+  </ol>
+
+  <div class="bm-nota">
+    ⚠️ Se a barra de favoritos não estiver visível: <strong>Cmd+Shift+B</strong> (Chrome) ou <strong>Cmd+Shift+B</strong> (Safari)
+  </div>
+</main>
+
+<script nonce="{{NONCE}}">
+var codigo = 'javascript:(function(){try{var d=(window.runParams||{}).data||{};var nome=(d.productInfoComponent||{}).subject||document.querySelector(\'[data-pl="product-title"] h1,h1.product-title-text\')?.textContent?.trim()||(document.querySelector(\'meta[property="og:title"]\')?.content||"").split("|")[0].trim()||"";var imgs=[];((d.imageComponent||{}).imagePathList||[]).slice(0,6).forEach(function(p){imgs.push(/^https?:/.test(p)?p:"https:"+(p.startsWith("//"))?p:"//ae-pic-a1.aliexpress-media.com/kf/"+p);});if(!imgs.length){var og=document.querySelector(\'meta[property="og:image"]\');if(og)imgs.push(og.content);}var custo=0;var sk=(d.skuComponent||{}).skuPriceList||[];if(sk.length){var am=sk.map(function(s){return parseFloat(((s.skuVal||{}).skuAmount||{}).value||0);}).filter(Boolean);if(am.length)custo=Math.round(Math.min.apply(null,am)*100);}var cores=[];var sp=(((d.skuComponent||{}).skuBase)||{}).skuPropertyList||[];for(var i=0;i<sp.length;i++){if(/col|cor/i.test(sp[i].skuPropertyName||"")){(sp[i].skuPropertyValues||[]).forEach(function(v){var h=(v.skuColorValue||"").trim();cores.push({nome:v.propertyValueDefinitionName||v.propertyValueDisplayName||v.propertyValueName||"",hex:/^#/.test(h)?h:"#888888"});});break;}}var rating=parseFloat((d.feedbackComponent||{}).evarageStar)||4.8;var avals=parseInt((d.feedbackComponent||{}).totalValidNum)||0;var url=location.href.split("?")[0];var m=url.match(/\\/item\\/(\\d+)\\.html/);var payload={nome:nome,cores:cores,imagens_urls:imgs,rating:rating,num_avaliacoes:avals,fornecedor_url:url,fornecedor_product_id:m?m[1]:"",custo_aliexpress:custo,tempo_envio_dias:"8-15"};window.open("https://techgang.pt/funitocorp/importar#"+btoa(unescape(encodeURIComponent(JSON.stringify(payload)))),"_blank");}catch(e){alert("Erro: "+e.message);}})();';
+document.getElementById('bm-link').href = codigo;
+</script>
+</body>
+</html>

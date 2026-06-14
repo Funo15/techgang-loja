@@ -48,47 +48,63 @@
 // Gerar o código do bookmarklet
 var codigo = `javascript:(function(){
   try{
-    var d=(window.runParams||{}).data||{};
-    var nome=(d.productInfoComponent||{}).subject||document.querySelector('h1[data-pl],h1')?.textContent?.trim()||'';
+    // 1. NOME — várias tentativas
+    var nome='';
+    var d=(window.runParams||window._dida_runParams||{}).data||{};
+    nome=(d.productInfoComponent||{}).subject||'';
+    if(!nome){var el=document.querySelector('h1[data-pl="product-title"],h1.product-title-text,[class*="title--wrap"] h1');if(el)nome=el.textContent.trim();}
+    if(!nome){var og=document.querySelector('meta[property="og:title"]');if(og)nome=og.content.split('|')[0].trim();}
 
-    var preco=0,preco_promo=null,custo=0;
-    var skuList=((d.skuComponent||{}).skuPriceList)||[];
+    // 2. IMAGENS — meta og:image + galeria
+    var imgs=[];
+    ((d.imageComponent||{}).imagePathList||[]).slice(0,6).forEach(function(p){
+      var u=(/^https?:/.test(p)?p:('https:'+(p.startsWith('//')?p:'//ae-pic-a1.aliexpress-media.com/kf/'+p)));
+      if(!/_\\d+x\\d+/.test(u))u=u.replace(/\\.\\w+$/,function(e){return e===''+e?'_960x960'+e:e;});
+      imgs.push(u);
+    });
+    if(!imgs.length){document.querySelectorAll('img[src*="aliexpress-media"],[src*="alicdn"]').forEach(function(i){var s=i.src||i.dataset.src;if(s&&imgs.length<6&&!imgs.includes(s))imgs.push(s);});}
+    if(!imgs.length){var og2=document.querySelector('meta[property="og:image"]');if(og2)imgs.push(og2.content);}
+
+    // 3. CUSTO — preço mais baixo do AliExpress
+    var custo=0;
+    var skuList=(d.skuComponent||{}).skuPriceList||[];
     if(skuList.length){
       var amounts=skuList.map(function(s){return parseFloat(((s.skuVal||{}).skuAmount||{}).value||0);}).filter(Boolean);
-      if(amounts.length){var mn=Math.min.apply(null,amounts);custo=Math.round(mn*100);}
+      if(amounts.length)custo=Math.round(Math.min.apply(null,amounts)*100);
     }
+    if(!custo){var pEl=document.querySelector('[class*="uniform-banner-box-price"],[class*="currentPrice"],[class*="price--current"]');if(pEl){var pv=parseFloat(pEl.textContent.replace(/[^0-9,.]/g,'').replace(',','.'));if(pv)custo=Math.round(pv*100);}}
 
+    // 4. CORES
     var cores=[];
     var skuProps=(((d.skuComponent||{}).skuBase)||{}).skuPropertyList||[];
     for(var i=0;i<skuProps.length;i++){
-      var p=skuProps[i];
-      if(/col|cor/i.test(p.skuPropertyName||'')){
-        (p.skuPropertyValues||[]).forEach(function(v){
-          var hex=v.skuColorValue||'#888888';
-          if(!/^#/.test(hex))hex='#888888';
-          var nome_cor=v.propertyValueDefinitionName||v.propertyValueDisplayName||v.propertyValueName||'';
-          if(nome_cor)cores.push({nome:nome_cor,hex:hex});
+      var sp=skuProps[i];
+      if(/col|cor|color/i.test(sp.skuPropertyName||'')){
+        (sp.skuPropertyValues||[]).forEach(function(v){
+          var hex=(v.skuColorValue||'').trim();
+          if(hex&&!/^#/.test(hex))hex='#888888';
+          var nc=v.propertyValueDefinitionName||v.propertyValueDisplayName||v.propertyValueName||'';
+          if(nc)cores.push({nome:nc,hex:hex||'#888888'});
         });
         break;
       }
     }
 
-    var imgs=[];
-    ((d.imageComponent||{}).imagePathList||[]).slice(0,6).forEach(function(p){
-      if(/^https?:/.test(p)){imgs.push(p);}
-      else{imgs.push('https:'+(p.startsWith('//')?p:'//ae-pic-a1.aliexpress-media.com/kf/'+p)+'_960x960.png');}
-    });
-
+    // 5. RATING
     var rating=parseFloat((d.feedbackComponent||{}).evarageStar)||4.8;
     var avals=parseInt((d.feedbackComponent||{}).totalValidNum)||0;
+    if(!avals){var rEl=document.querySelector('[class*="reviewer--reviews"]');if(rEl)avals=parseInt(rEl.textContent)||0;}
+
     var url=location.href.split('?')[0];
     var m=url.match(/\\/item\\/(\\d+)\\.html/);
     var pid=m?m[1]:'';
 
+    if(!nome&&!imgs.length){alert('Não foi possível ler os dados do produto. Certifica-te que estás numa página de produto do AliExpress.');return;}
+
     var payload={nome:nome,cores:cores,imagens_urls:imgs,rating:rating,num_avaliacoes:avals,fornecedor_url:url,fornecedor_product_id:pid,custo_aliexpress:custo,tempo_envio_dias:'8-15'};
     var encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
     window.open('https://techgang.pt/funitocorp/importar#'+encoded,'_blank');
-  }catch(e){alert('Erro ao ler produto: '+e.message);}
+  }catch(e){alert('Erro: '+e.message);}
 })();`;
 
 document.getElementById('bm-link').href = codigo;
