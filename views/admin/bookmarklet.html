@@ -19,27 +19,52 @@
   <p>Configura o atalho uma vez e depois importas qualquer produto em segundos.</p>
 
   <div class="bm-caixa">
-    <p style="margin:0 0 16px;font-weight:600">Arrasta este botão para a barra de favoritos:</p>
-    <a class="bm-link" id="bm-link" href="#">⬇️ Importar para TechGang</a>
-    <p style="margin:12px 0 0;font-size:13px;color:var(--cor-texto-suave)">Arrasta ↑ para a barra de favoritos do browser</p>
+    <p style="margin:0 0 16px;font-weight:600;font-size:17px">Passo 1 — Copia o código do bookmark:</p>
+    <button class="adm-btn adm-btn-primario" id="btn-copiar" style="font-size:16px;padding:14px 28px">📋 Copiar código do bookmark</button>
+    <p id="copiado" style="margin:10px 0 0;color:green;font-weight:600;display:none">✓ Copiado!</p>
   </div>
 
   <ol class="bm-passos">
-    <li>Arrasta o botão roxo para a barra de favoritos (aparece em cima no browser)</li>
-    <li>Abre qualquer produto no AliExpress</li>
-    <li>Clica no favorito <strong>"Importar para TechGang"</strong></li>
-    <li>Abre esta página com os dados pré-preenchidos</li>
-    <li>Define o preço de venda e clica <strong>Importar</strong></li>
+    <li>Clica em <strong>"Copiar código do bookmark"</strong> acima</li>
+    <li>Prime <strong>Cmd+Shift+O</strong> para abrir o gestor de marcadores do Chrome</li>
+    <li>Clica em <strong>"Adicionar novo marcador"</strong> (canto superior direito)</li>
+    <li>Nome: <strong>Importar TechGang</strong> — URL: cola com <strong>Cmd+V</strong></li>
+    <li>Guarda — aparece na barra de favoritos</li>
+    <li>Abre um produto no AliExpress e clica no marcador</li>
   </ol>
 
   <div class="bm-nota">
-    ⚠️ Se a barra de favoritos não estiver visível: <strong>Cmd+Shift+B</strong> (Chrome) ou <strong>Cmd+Shift+B</strong> (Safari)
+    ⚠️ Se a barra de favoritos não estiver visível prime <strong>Cmd+Shift+B</strong>
   </div>
 </main>
 
 <script nonce="{{NONCE}}">
-var codigo = 'javascript:(function(){try{var d=(window.runParams||{}).data||{};var nome=(d.productInfoComponent||{}).subject||document.querySelector(\'[data-pl="product-title"] h1,h1.product-title-text\')?.textContent?.trim()||(document.querySelector(\'meta[property="og:title"]\')?.content||"").split("|")[0].trim()||"";var imgs=[];((d.imageComponent||{}).imagePathList||[]).slice(0,6).forEach(function(p){imgs.push(/^https?:/.test(p)?p:"https:"+(p.startsWith("//"))?p:"//ae-pic-a1.aliexpress-media.com/kf/"+p);});if(!imgs.length){var og=document.querySelector(\'meta[property="og:image"]\');if(og)imgs.push(og.content);}var custo=0;var sk=(d.skuComponent||{}).skuPriceList||[];if(sk.length){var am=sk.map(function(s){return parseFloat(((s.skuVal||{}).skuAmount||{}).value||0);}).filter(Boolean);if(am.length)custo=Math.round(Math.min.apply(null,am)*100);}var cores=[];var sp=(((d.skuComponent||{}).skuBase)||{}).skuPropertyList||[];for(var i=0;i<sp.length;i++){if(/col|cor/i.test(sp[i].skuPropertyName||"")){(sp[i].skuPropertyValues||[]).forEach(function(v){var h=(v.skuColorValue||"").trim();cores.push({nome:v.propertyValueDefinitionName||v.propertyValueDisplayName||v.propertyValueName||"",hex:/^#/.test(h)?h:"#888888"});});break;}}var rating=parseFloat((d.feedbackComponent||{}).evarageStar)||4.8;var avals=parseInt((d.feedbackComponent||{}).totalValidNum)||0;var url=location.href.split("?")[0];var m=url.match(/\\/item\\/(\\d+)\\.html/);var payload={nome:nome,cores:cores,imagens_urls:imgs,rating:rating,num_avaliacoes:avals,fornecedor_url:url,fornecedor_product_id:m?m[1]:"",custo_aliexpress:custo,tempo_envio_dias:"8-15"};window.open("https://techgang.pt/funitocorp/importar#"+btoa(unescape(encodeURIComponent(JSON.stringify(payload)))),"_blank");}catch(e){alert("Erro: "+e.message);}})();';
+var codigo = 'javascript:(function(){try{'+
+'var nome=document.querySelector("h1[data-pl]")?.textContent?.trim()||(document.querySelector("meta[property=\'og:title\']")?.content||"").split(" - ")[0].trim()||"";'+
+'var dc=(window._d_c_||{}).DCData||{};'+
+'var imgs=(dc.imagePathList||[]).slice(0,6).map(function(u){return/^https?:/.test(u)?u:"https:"+u;});'+
+'if(!imgs.length){var og=document.querySelector("meta[property=\'og:image\']");if(og)imgs.push(og.content);}'+
+'var precoEl=document.querySelector("[class*=currentWrap]");'+
+'var precoTexto=precoEl?precoEl.textContent.trim():"";'+
+'var custo=precoTexto?Math.round(parseFloat(precoTexto.replace(/[^0-9,]/g,"").replace(",","."))*100):0;'+
+'var cores=Array.from(document.querySelectorAll("[class*=sku] img[alt]")).filter(function(i){return i.alt&&i.alt.length>1;}).map(function(i){return{nome:i.alt,hex:"#888888"};}).filter(function(c,i,a){return a.findIndex(function(x){return x.nome===c.nome;})===i;}).slice(0,8);'+
+'var ratingEl=document.querySelector("[class*=reviewer--rating],[class*=overview-rating]");'+
+'var rating=ratingEl?parseFloat(ratingEl.textContent)||4.8:4.8;'+
+'var avalsEl=document.querySelector("[class*=reviewer--reviews]");'+
+'var avals=avalsEl?parseInt(avalsEl.textContent)||0:0;'+
+'var url=location.href.split("?")[0];'+
+'var m=url.match(/\\/item\\/(\\d+)\\.html/);'+
+'if(!nome&&!imgs.length){alert("Abre um produto no AliExpress primeiro!");return;}'+
+'var payload={nome:nome,cores:cores,imagens_urls:imgs,rating:rating,num_avaliacoes:avals,fornecedor_url:url,fornecedor_product_id:m?m[1]:"",custo_aliexpress:custo,tempo_envio_dias:"8-15"};'+
+'window.open("https://techgang.pt/funitocorp/importar#"+btoa(unescape(encodeURIComponent(JSON.stringify(payload)))),"_blank");'+
+'}catch(e){alert("Erro: "+e.message);}})();';
 document.getElementById('bm-link').href = codigo;
+document.getElementById('btn-copiar').addEventListener('click', function() {
+  navigator.clipboard.writeText(codigo).then(function() {
+    document.getElementById('copiado').style.display = 'block';
+    setTimeout(function(){ document.getElementById('copiado').style.display = 'none'; }, 3000);
+  });
+});
 </script>
 </body>
 </html>
