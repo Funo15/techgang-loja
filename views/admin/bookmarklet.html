@@ -40,14 +40,17 @@
 
 <script nonce="{{NONCE}}">
 var codigo = 'javascript:(function(){try{'+
-'var nome=document.querySelector("h1[data-pl]")?.textContent?.trim()||(document.querySelector("meta[property=\'og:title\']")?.content||"").split(" - ")[0].trim()||"";'+
+'var nome=document.querySelector("h1[data-pl]")?.textContent?.trim()||(document.querySelector("meta[property=\'og:title\']")?.content||"").split("-")[0].trim()||"";'+
 'var dc=(window._d_c_||{}).DCData||{};'+
 'var imgs=(dc.imagePathList||[]).slice(0,6).map(function(u){return/^https?:/.test(u)?u:"https:"+u;});'+
 'if(!imgs.length){var og=document.querySelector("meta[property=\'og:image\']");if(og)imgs.push(og.content);}'+
-'var precoEl=document.querySelector("[class*=currentWrap]");'+
-'var precoTexto=precoEl?precoEl.textContent.trim():"";'+
-'var custo=precoTexto?Math.round(parseFloat(precoTexto.replace(/[^0-9,]/g,"").replace(",","."))*100):0;'+
-'var cores=Array.from(document.querySelectorAll("[class*=sku] img[alt]")).filter(function(i){return i.alt&&i.alt.length>1;}).map(function(i){return{nome:i.alt,hex:"#888888"};}).filter(function(c,i,a){return a.findIndex(function(x){return x.nome===c.nome;})===i;}).slice(0,8);'+
+'var custoEl=document.querySelector("[class*=price-default--current]");'+
+'var origEl=document.querySelector("[class*=price-default--original]");'+
+'function parsePreco(el){if(!el)return 0;return Math.round(parseFloat(el.textContent.replace(/[^0-9,]/g,"").replace(",","."))*100);}'+
+'var custo=parsePreco(custoEl);'+
+'var precoOrigAli=parsePreco(origEl);'+
+'var cores=Array.from(document.querySelectorAll("[class*=sku-item--image] img")).map(function(i){return{nome:i.alt,hex:"#888888"};}).filter(function(c,i,a){return c.nome&&a.findIndex(function(x){return x.nome===c.nome;})===i;}).slice(0,8);'+
+'if(!cores.length){cores=Array.from(document.querySelectorAll("[class*=sku-item--text]")).map(function(el){return{nome:el.textContent.trim(),hex:"#888888"};}).filter(function(c,i,a){return c.nome&&a.findIndex(function(x){return x.nome===c.nome;})===i;}).slice(0,8);}'+
 'var ratingEl=document.querySelector("[class*=reviewer--rating],[class*=overview-rating]");'+
 'var rating=ratingEl?parseFloat(ratingEl.textContent)||4.8:4.8;'+
 'var avalsEl=document.querySelector("[class*=reviewer--reviews]");'+
@@ -55,10 +58,9 @@ var codigo = 'javascript:(function(){try{'+
 'var url=location.href.split("?")[0];'+
 'var m=url.match(/\\/item\\/(\\d+)\\.html/);'+
 'if(!nome&&!imgs.length){alert("Abre um produto no AliExpress primeiro!");return;}'+
-'var payload={nome:nome,cores:cores,imagens_urls:imgs,rating:rating,num_avaliacoes:avals,fornecedor_url:url,fornecedor_product_id:m?m[1]:"",custo_aliexpress:custo,tempo_envio_dias:"8-15"};'+
+'var payload={nome:nome,cores:cores,imagens_urls:imgs,rating:rating,num_avaliacoes:avals,fornecedor_url:url,fornecedor_product_id:m?m[1]:"",custo_aliexpress:custo,preco_original_aliexpress:precoOrigAli,tempo_envio_dias:"8-15"};'+
 'window.open("https://techgang.pt/funitocorp/importar#"+btoa(unescape(encodeURIComponent(JSON.stringify(payload)))),"_blank");'+
 '}catch(e){alert("Erro: "+e.message);}})();';
-document.getElementById('bm-link').href = codigo;
 document.getElementById('btn-copiar').addEventListener('click', function() {
   navigator.clipboard.writeText(codigo).then(function() {
     document.getElementById('copiado').style.display = 'block';

@@ -23,13 +23,13 @@
       </div>
       <div class="campo-linha-3">
         <div class="campo">
-          <label>Preço (cêntimos)</label>
-          <input name="preco" type="number" min="1" step="1" placeholder="2499" required>
+          <label>Preço original (€) — riscado se houver promo</label>
+          <input name="preco" type="number" min="0.01" step="0.01" placeholder="24.99" required>
           <small class="adm-erro" data-erro="preco" hidden></small>
         </div>
         <div class="campo">
-          <label>Preço promo (cêntimos)</label>
-          <input name="preco_promo" type="number" min="1" step="1" placeholder="vazio = sem promo">
+          <label>Preço de venda (€) — deixa vazio se não houver desconto</label>
+          <input name="preco_promo" type="number" min="0.01" step="0.01" placeholder="vazio = sem desconto">
           <small class="adm-erro" data-erro="preco_promo" hidden></small>
         </div>
         <div class="campo">
@@ -92,8 +92,8 @@
           <input name="fornecedor_product_id" type="text" placeholder="CJ-GP-2201">
         </div>
         <div class="campo">
-          <label>Custo (cêntimos)</label>
-          <input name="custo_fornecedor" type="number" min="0" step="1" placeholder="720">
+          <label>Custo fornecedor (€)</label>
+          <input name="custo_fornecedor" type="number" min="0" step="0.01" placeholder="7.20">
           <small class="adm-erro" data-erro="custo_fornecedor" hidden></small>
         </div>
       </div>

@@ -519,11 +519,13 @@
     // Editar: pré-preenche com os dados atuais
     if (idProduto) {
       api(`/api/admin/produtos/${idProduto}`).then(p => {
+        const camposEuro = ['preco', 'preco_promo', 'custo_fornecedor'];
         for (const [campo, valor] of Object.entries(p)) {
           const input = form.elements[campo];
           if (!input) continue;
           if (input.type === 'checkbox') input.checked = !!valor;
           else if (campo === 'cores' || campo === 'specs') input.value = JSON.stringify(valor);
+          else if (camposEuro.includes(campo)) input.value = valor != null ? (valor / 100).toFixed(2) : '';
           else input.value = valor ?? '';
         }
         imagens = p.imagens;
@@ -548,9 +550,12 @@
           return;
         }
       }
+      const camposEuro = ['preco', 'preco_promo', 'custo_fornecedor'];
       for (const campo of ['preco', 'preco_promo', 'custo_fornecedor', 'num_avaliacoes']) {
-        if (dados[campo] === '') delete dados[campo];
-        else if (dados[campo] != null) dados[campo] = Number(dados[campo]);
+        if (dados[campo] === '' || dados[campo] == null) { delete dados[campo]; continue; }
+        dados[campo] = camposEuro.includes(campo)
+          ? Math.round(Number(dados[campo]) * 100)
+          : Number(dados[campo]);
       }
       dados.disponivel = form.elements.disponivel.checked;
       dados.destaque = form.elements.destaque.checked;

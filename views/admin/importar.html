@@ -21,6 +21,11 @@
 
     <section class="adm-bloco">
       <h2>Informação da loja</h2>
+      <div id="imp-ref-aliexpress" style="background:#f0fdf4;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:14px;display:none">
+        <strong>Referência AliExpress:</strong>
+        Preço de compra: <span id="imp-ref-custo" style="font-weight:700;color:#166534"></span>
+        &nbsp;·&nbsp; Preço original AliExpress: <span id="imp-ref-orig" style="color:#888;text-decoration:line-through"></span>
+      </div>
       <div class="campo">
         <label>Nome do produto</label>
         <input id="imp-nome" name="nome" type="text" required>
@@ -31,12 +36,12 @@
       </div>
       <div class="campo-linha-3">
         <div class="campo">
-          <label>Preço de venda (€)</label>
+          <label>Preço original (€) — aparece riscado quando há desconto</label>
           <input id="imp-preco" name="preco" type="number" min="0.01" step="0.01" placeholder="59.90" required>
         </div>
         <div class="campo">
-          <label>Preço riscado (€)</label>
-          <input id="imp-preco-promo" name="preco_promo" type="number" min="0.01" step="0.01" placeholder="vazio = sem risco">
+          <label>Preço com desconto (€) — deixa vazio se não há desconto</label>
+          <input id="imp-preco-promo" name="preco_promo" type="number" min="0.01" step="0.01" placeholder="vazio = sem desconto">
         </div>
         <div class="campo">
           <label>Categoria</label>
@@ -113,8 +118,23 @@
   if (d.num_avaliacoes) document.getElementById('imp-avaliacoes').value = d.num_avaliacoes;
   if (d.fornecedor_url) document.getElementById('imp-url').value = d.fornecedor_url;
   if (d.fornecedor_product_id) document.getElementById('imp-pid').value = d.fornecedor_product_id;
-  if (d.custo_aliexpress) document.getElementById('imp-custo').value = d.custo_aliexpress;
   document.getElementById('imp-envio').value = d.tempo_envio_dias || '8-15';
+
+  // Custo AliExpress (vem em cêntimos do bookmarklet → mostrar em euros)
+  if (d.custo_aliexpress) {
+    var custoEuros = (d.custo_aliexpress / 100).toFixed(2);
+    document.getElementById('imp-custo').value = custoEuros;
+    // Mostrar info de referência
+    var refBox = document.getElementById('imp-ref-aliexpress');
+    refBox.style.display = 'block';
+    document.getElementById('imp-ref-custo').textContent = custoEuros + '€';
+    if (d.preco_original_aliexpress) {
+      document.getElementById('imp-ref-orig').textContent = (d.preco_original_aliexpress / 100).toFixed(2) + '€';
+    }
+    // Sugestão: ~3x custo arredondado
+    var sugestao = Math.ceil(d.custo_aliexpress / 100 * 3 / 5) * 5;
+    document.getElementById('imp-preco').placeholder = 'ex: ' + sugestao.toFixed(2);
+  }
 
   // Cores
   var cores = Array.isArray(d.cores) ? d.cores : [];
@@ -143,11 +163,6 @@
     });
   } else {
     prevDiv.innerHTML = '<p class="adm-ajuda">Sem imagens detectadas.</p>';
-  }
-
-  // Sugestão de preço baseada no custo AliExpress (3x)
-  if (d.custo_aliexpress && !d.preco) {
-    document.getElementById('imp-preco').placeholder = 'Sugestão: ' + (d.custo_aliexpress * 3);
   }
 
   // Submit
