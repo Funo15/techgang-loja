@@ -12,7 +12,7 @@ const router = express.Router();
 router.post('/registar', limitadorConta, async (req, res) => {
   const { nome, email, password } = req.body || {};
   if (!nome || !email || !password) return res.status(400).json({ erro: 'Preenche todos os campos.' });
-  if (password.length < 6) return res.status(400).json({ erro: 'Password mínimo 6 caracteres.' });
+  if (password.length < 8) return res.status(400).json({ erro: 'Password mínimo 8 caracteres.' });
   const resultado = await auth.registar({ nome, email, password });
   if (!resultado.ok) return res.status(409).json({ erro: resultado.erro });
   const cliente = db.prepare('SELECT * FROM customers WHERE email = ?').get(email.toLowerCase().trim());
