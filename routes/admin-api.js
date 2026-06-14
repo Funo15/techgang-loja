@@ -372,6 +372,13 @@ router.patch('/produtos/:id/toggle', (req, res) => {
   res.json({ ok: true, valor: !!valor });
 });
 
+router.delete('/produtos/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const r = db.prepare('DELETE FROM products WHERE id = ?').run(id);
+  if (r.changes === 0) return res.status(404).json({ erro: 'Produto não encontrado' });
+  res.json({ ok: true });
+});
+
 // ------------------------------------------------------------
 // IMPORTAR PRODUTO (bookmarklet AliExpress)
 // ------------------------------------------------------------

@@ -432,7 +432,8 @@
           <td><button class="adm-toggle ${p.destaque ? 'on' : ''}" data-campo="destaque" aria-label="Destaque"></button></td>
           <td style="white-space:nowrap">
             <a href="/funitocorp/produtos/${p.id}">Editar</a> ·
-            <a href="#" data-campo="ativo" class="apagar">${p.ativo ? 'Desativar' : 'Reativar'}</a>
+            <a href="#" data-campo="ativo" class="apagar">${p.ativo ? 'Desativar' : 'Reativar'}</a> ·
+            <a href="#" data-campo="apagar" style="color:var(--cor-perigo)">Apagar</a>
           </td>
         </tr>`;
       }).join('') : '<tr><td colspan="8" class="adm-vazio">Sem produtos.</td></tr>';
@@ -465,6 +466,12 @@
       e.preventDefault();
       const id = alvo.closest('tr').dataset.id;
       const campo = alvo.dataset.campo;
+      if (campo === 'apagar') {
+        if (!confirm('Apagar este produto permanentemente? Esta ação não pode ser revertida.')) return;
+        await api(`/api/admin/produtos/${id}`, { method: 'DELETE' });
+        carregar();
+        return;
+      }
       if (campo === 'ativo' && alvo.textContent === 'Desativar' &&
           !confirm('Desativar este produto? Deixa de aparecer na loja (não é apagado da BD).')) return;
       const r = await api(`/api/admin/produtos/${id}/toggle`, { method: 'PATCH', body: { campo } });
