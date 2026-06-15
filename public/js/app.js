@@ -562,14 +562,17 @@
       swatchesEl.innerHTML = varDims.map((dim, di) => {
         variantesAtivas[dim.titulo] = dim.opcoes[0]?.nome || '';
         const opcaoHTML = dim.opcoes.map((op, oi) => {
-          // Swatch de cor só quando há um hex REAL e distinto (não o placeholder
-          // cinzento que o bookmarklet usa para variantes baseadas em imagem).
+          // 1. Variante com foto → miniatura clicável que troca a imagem principal
+          if (op.imagem) {
+            return `<button class="variante-foto${oi === 0 ? ' ativo' : ''}" role="radio" aria-checked="${oi === 0}" aria-label="${esc(op.nome)}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}" data-img="${esc(op.imagem)}" title="${esc(op.nome)}"><img src="${esc(op.imagem)}" alt="${esc(op.nome)}" loading="lazy" width="56" height="56"></button>`;
+          }
+          // 2. Swatch de cor só quando há um hex REAL e distinto (não o placeholder cinzento).
           const hexLimpo = (op.hex || '').toLowerCase();
           const hexValido = /^#[0-9a-fA-F]{3,6}$/.test(hexLimpo) && hexLimpo !== '#888888' && hexLimpo !== '#888';
           if (dim.tipo === 'cor' && hexValido) {
             return `<button class="swatch${oi === 0 ? ' ativo' : ''}" style="background:${op.hex}" role="radio" aria-checked="${oi === 0}" aria-label="${esc(op.nome)}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}" title="${esc(op.nome)}"></button>`;
           }
-          // Sem cor real → botão de texto com o nome (descritivo e legível)
+          // 3. Sem cor nem foto → botão de texto com o nome (descritivo e legível)
           return `<button class="variante-btn${oi === 0 ? ' ativo' : ''}" role="radio" aria-checked="${oi === 0}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}">${esc(op.nome)}</button>`;
         }).join('');
         return `<div class="variante-grupo" style="margin-bottom:10px">
@@ -591,6 +594,11 @@
         variantesAtivas[dim] = val;
         const idx = b.closest('.variante-grupo').querySelector('[role=radiogroup]').dataset.grupo;
         document.getElementById('sel-' + idx).textContent = val;
+        // Variante com foto → trocar a imagem principal da galeria
+        if (b.dataset.img) {
+          const imgPrincipal = document.getElementById('galeria-imagem');
+          if (imgPrincipal) imgPrincipal.src = b.dataset.img;
+        }
       });
     }
 

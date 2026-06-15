@@ -716,6 +716,30 @@ body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
   background: var(--cor-acento);
   color: var(--cor-acento-texto);
 }
+/* Miniatura de variante (foto da cor) */
+.variante-foto {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  border: 2px solid var(--cor-linha);
+  padding: 2px;
+  cursor: pointer;
+  background: var(--cor-fundo-elevado);
+  overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.variante-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 9px;
+  display: block;
+}
+.variante-foto:hover { transform: translateY(-2px); border-color: var(--cor-acento); }
+.variante-foto.ativo {
+  border-color: var(--cor-acento);
+  box-shadow: 0 0 0 1.5px var(--cor-acento);
+}
 
 /* Cartões de specs (Garantia, Aquecimento, ...) */
 .produto-specs {

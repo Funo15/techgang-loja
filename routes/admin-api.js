@@ -492,6 +492,28 @@ router.post('/importar-produto', async (req, res) => {
     }
   }
 
+  // Descarregar imagens das variantes de cor (miniaturas que trocam a foto principal)
+  const variantesProcessadas = Array.isArray(variantes) ? variantes : [];
+  for (const v of variantesProcessadas) {
+    if (!v || !Array.isArray(v.opcoes)) continue;
+    for (const op of v.opcoes) {
+      if (op && op.imagem && /^https?:\/\//i.test(op.imagem)) {
+        try {
+          const buf = await downloadUrl(op.imagem);
+          const nf = `v-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+          await sharp(buf)
+            .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 82 })
+            .toFile(path.join(PASTA_UPLOADS, nf));
+          op.imagem = '/media/' + nf;
+        } catch (e) {
+          console.error('[importar] imagem de variante falhou:', e.message);
+          delete op.imagem; // sem imagem → cai para botão de texto na loja
+        }
+      }
+    }
+  }
+
   // Slug único
   let slug = slugificar(nome);
   const existe = db.prepare('SELECT id FROM products WHERE slug = ?').get(slug);
@@ -520,7 +542,7 @@ router.post('/importar-produto', async (req, res) => {
     Math.max(0, parseInt(num_avaliacoes, 10) || 0),
     JSON.stringify(Array.isArray(cores) ? cores : []),
     JSON.stringify(Array.isArray(specs) ? specs : []),
-    JSON.stringify(Array.isArray(variantes) ? variantes : [])
+    JSON.stringify(variantesProcessadas)
   );
 
   res.json({ ok: true, id: r.lastInsertRowid, slug });
