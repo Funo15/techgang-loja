@@ -562,12 +562,15 @@
       swatchesEl.innerHTML = varDims.map((dim, di) => {
         variantesAtivas[dim.titulo] = dim.opcoes[0]?.nome || '';
         const opcaoHTML = dim.opcoes.map((op, oi) => {
-          if (dim.tipo === 'cor') {
-            const hex = /^#[0-9a-fA-F]{3,6}$/.test(op.hex || '') ? op.hex : '#888888';
-            return `<button class="swatch${oi === 0 ? ' ativo' : ''}" style="background:${hex}" role="radio" aria-checked="${oi === 0}" aria-label="${esc(op.nome)}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}" title="${esc(op.nome)}"></button>`;
-          } else {
-            return `<button class="variante-btn${oi === 0 ? ' ativo' : ''}" role="radio" aria-checked="${oi === 0}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}">${esc(op.nome)}</button>`;
+          // Swatch de cor só quando há um hex REAL e distinto (não o placeholder
+          // cinzento que o bookmarklet usa para variantes baseadas em imagem).
+          const hexLimpo = (op.hex || '').toLowerCase();
+          const hexValido = /^#[0-9a-fA-F]{3,6}$/.test(hexLimpo) && hexLimpo !== '#888888' && hexLimpo !== '#888';
+          if (dim.tipo === 'cor' && hexValido) {
+            return `<button class="swatch${oi === 0 ? ' ativo' : ''}" style="background:${op.hex}" role="radio" aria-checked="${oi === 0}" aria-label="${esc(op.nome)}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}" title="${esc(op.nome)}"></button>`;
           }
+          // Sem cor real → botão de texto com o nome (descritivo e legível)
+          return `<button class="variante-btn${oi === 0 ? ' ativo' : ''}" role="radio" aria-checked="${oi === 0}" data-dim="${esc(dim.titulo)}" data-val="${esc(op.nome)}">${esc(op.nome)}</button>`;
         }).join('');
         return `<div class="variante-grupo" style="margin-bottom:10px">
           <span class="rotulo-mini" style="display:block;margin-bottom:6px">${esc(dim.titulo)}: <strong id="sel-${di}">${esc(dim.opcoes[0]?.nome || '')}</strong></span>
