@@ -869,6 +869,30 @@ body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
 .produto-indisponivel { color: var(--cor-perigo); font-weight: 600; margin-bottom: 1.5rem; }
 .produto-envio-nota { color: var(--cor-texto-suave); font-size: 0.92rem; }
 
+/* Bloco de benefícios/confiança na página de produto */
+.produto-beneficios {
+  list-style: none;
+  margin-top: 1.7rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--cor-linha);
+  display: grid;
+  gap: 1.05rem;
+}
+.produto-beneficios li { display: flex; align-items: center; gap: 0.9rem; }
+.ben-ic {
+  width: 44px; height: 44px; flex-shrink: 0;
+  border-radius: 13px;
+  background: var(--lilas);
+  color: var(--cor-acento);
+  display: flex; align-items: center; justify-content: center;
+}
+.ben-ic svg { width: 23px; height: 23px; }
+.produto-beneficios strong { display: block; font-size: 0.96rem; font-weight: 700; }
+.produto-beneficios small { color: var(--cor-texto-suave); font-size: 0.85rem; }
+@media (min-width: 768px) {
+  .produto-beneficios { grid-template-columns: 1fr 1fr; gap: 1.2rem 1.6rem; }
+}
+
 /* ---------- Drawer do carrinho ---------- */
 .carrinho-overlay {
   position: fixed;
