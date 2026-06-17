@@ -33,6 +33,8 @@ app.disable('x-powered-by');
 // borda do Railway pode na mesma adicionar os seus próprios).
 app.use((req, res, next) => {
   res.setHeader('Server', 'TechGang');
+  // Desligar funcionalidades do browser que o site não usa (defesa em profundidade)
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=(), usb=()');
   next();
 });
 
