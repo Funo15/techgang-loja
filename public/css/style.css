@@ -642,6 +642,10 @@ body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
   background: var(--lilas);
 }
 .galeria-principal img { width: 100%; height: 100%; object-fit: contain; }
+/* No mobile, galeria mais curta (1:1) para o preço e o botão subirem */
+@media (max-width: 767px) {
+  .galeria-principal { aspect-ratio: 1 / 1; }
+}
 
 /* Badge de desconto preto (estilo "-38%") */
 .badge-desconto {
