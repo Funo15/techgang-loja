@@ -341,6 +341,44 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
   padding: 1.5rem;
   transform: rotate(-4deg);
 }
+/* Showcase de produtos reais (flutuante) */
+.banner-showcase {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1.5rem;
+}
+.banner-showcase::before {
+  content: "";
+  position: absolute;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--cor-acento-texto) 35%, transparent), transparent 70%);
+  filter: blur(40px);
+  z-index: 0;
+}
+.banner-prod {
+  position: relative;
+  z-index: 1;
+  height: 230px;
+  width: auto;
+  filter: drop-shadow(0 18px 28px rgba(20,16,35,0.4));
+  animation: tile-flutua 5s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.banner-prod:nth-child(odd) { translate: 0 16px; }
+.banner-prod-centro { height: 280px; }
+@media (prefers-reduced-motion: reduce) {
+  .banner-prod { animation: none; }
+}
+@media (max-width: 640px) {
+  .banner-prod { height: 150px; }
+  .banner-prod-centro { height: 184px; }
+  .banner-showcase { gap: 0.3rem; padding: 0.8rem; }
+  .banner-showcase::before { width: 180px; height: 180px; }
+}
 .banner-tile {
   width: 86px;
   height: 86px;
