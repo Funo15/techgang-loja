@@ -567,7 +567,7 @@ body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
   aspect-ratio: 4 / 5;
   background: var(--lilas);
 }
-.galeria-principal img { width: 100%; height: 100%; object-fit: cover; }
+.galeria-principal img { width: 100%; height: 100%; object-fit: contain; }
 
 /* Badge de desconto preto (estilo "-38%") */
 .badge-desconto {
