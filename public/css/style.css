@@ -270,9 +270,10 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
 .seccao-banner { padding-top: 0.8rem; }
 .banner {
   position: relative;
+  --hero: url('/media/p-1781718119907-j3fzj3.webp');
   background:
     linear-gradient(100deg, #1d1240 0%, color-mix(in srgb, #1d1240 78%, transparent) 38%, color-mix(in srgb, #1d1240 30%, transparent) 58%, transparent 78%),
-    url('/media/p-1781718119907-j3fzj3.webp') center right / cover no-repeat,
+    var(--hero) center right / cover no-repeat,
     linear-gradient(135deg, var(--cor-acento) 0%, color-mix(in srgb, var(--cor-acento) 70%, #18103a) 100%);
   color: var(--cor-acento-texto);
   border-radius: 20px;
@@ -379,6 +380,17 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
   .banner-tile { animation: none; }
 }
 @media (max-width: 640px) {
+  /* Hero em coluna única: imagem ao fundo com overlay escuro p/ texto legível */
+  .banner {
+    grid-template-columns: 1fr;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, #140d2d 50%, transparent) 0%, color-mix(in srgb, #140d2d 82%, transparent) 100%),
+      var(--hero) center 28% / cover no-repeat,
+      linear-gradient(135deg, var(--cor-acento) 0%, #2a1c52 100%);
+  }
+  .banner-media { display: none; }
+  .banner-texto { padding: 1.7rem 1.3rem 1.5rem; }
+  .banner::after { display: none; }
   .banner-tile { width: 58px; height: 58px; font-size: 1.5rem; border-radius: 16px; }
   .banner-tiles { gap: 0.7rem; padding: 1rem 0.6rem; }
   .banner-confianca { gap: 0.7rem; font-size: 0.74rem; }
