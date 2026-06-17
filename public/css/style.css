@@ -587,7 +587,7 @@ body[data-page="produto"],
 body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
 
 .produto-detalhe {
-  max-width: 960px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 1.2rem 1.25rem 3rem;
   display: grid;
