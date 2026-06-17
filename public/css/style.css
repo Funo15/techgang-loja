@@ -749,7 +749,7 @@ body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
   border-radius: 12px;
 }
 .produto-nota-fiscal { color: var(--cor-texto-suave); font-size: 0.88rem; margin-bottom: 1.2rem; }
-.produto-descricao { color: color-mix(in srgb, var(--cor-texto) 78%, var(--cor-fundo-elevado)); font-size: 1rem; line-height: 1.6; max-width: 48ch; margin-bottom: 1.5rem; }
+.produto-descricao { color: color-mix(in srgb, var(--cor-texto) 78%, var(--cor-fundo-elevado)); font-size: 1rem; line-height: 1.6; max-width: 52ch; margin: 1.6rem 0 0; }
 
 /* Seletor de cor (quadrados arredondados) */
 .rotulo-mini {
