@@ -494,13 +494,44 @@
 
     function renderImagens() {
       document.getElementById('pf-imagens').innerHTML = imagens.map((u, i) => `
-        <span class="adm-imagem"><img src="${esc(u)}" alt="">
+        <span class="adm-imagem" draggable="true" data-idx="${i}">
+        <span class="adm-imagem-ordem">${i + 1}</span>
+        <img src="${esc(u)}" alt="">
         <button type="button" data-remove="${i}" aria-label="Remover">✕</button></span>`).join('');
     }
-    document.getElementById('pf-imagens').addEventListener('click', (e) => {
+    const pfImagens = document.getElementById('pf-imagens');
+    pfImagens.addEventListener('click', (e) => {
       const b = e.target.closest('[data-remove]');
       if (!b) return;
       imagens.splice(Number(b.dataset.remove), 1);
+      renderImagens();
+    });
+    // Arrastar para reordenar
+    let arrastaDe = null;
+    pfImagens.addEventListener('dragstart', (e) => {
+      const item = e.target.closest('[data-idx]');
+      if (!item) return;
+      arrastaDe = Number(item.dataset.idx);
+      e.dataTransfer.effectAllowed = 'move';
+      item.classList.add('a-arrastar');
+    });
+    pfImagens.addEventListener('dragend', (e) => {
+      const item = e.target.closest('[data-idx]');
+      if (item) item.classList.remove('a-arrastar');
+    });
+    pfImagens.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    pfImagens.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const alvo = e.target.closest('[data-idx]');
+      if (alvo == null || arrastaDe == null) return;
+      const para = Number(alvo.dataset.idx);
+      if (para === arrastaDe) return;
+      const [movida] = imagens.splice(arrastaDe, 1);
+      imagens.splice(para, 0, movida);
+      arrastaDe = null;
       renderImagens();
     });
 
