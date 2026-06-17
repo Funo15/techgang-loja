@@ -623,6 +623,13 @@
     imgPrincipal.src = p.imagens[0];
     imgPrincipal.alt = p.nome;
     const thumbs = document.getElementById('galeria-thumbs');
+    let galeriaIdx = 0;
+    function mostrarImagem(i) {
+      if (i < 0 || i >= p.imagens.length || i === galeriaIdx) return;
+      galeriaIdx = i;
+      imgPrincipal.src = p.imagens[i];
+      thumbs.querySelectorAll('button').forEach((b, bi) => b.classList.toggle('ativo', bi === i));
+    }
     if (p.imagens.length > 1) {
       thumbs.innerHTML = p.imagens.map((src, i) =>
         `<button class="${i === 0 ? 'ativo' : ''}" aria-label="Imagem ${i + 1}"><img src="${src}" alt="" loading="lazy"></button>`
@@ -630,11 +637,25 @@
       thumbs.addEventListener('click', (e) => {
         const botao = e.target.closest('button');
         if (!botao) return;
-        const i = [...thumbs.children].indexOf(botao);
-        imgPrincipal.src = p.imagens[i];
-        thumbs.querySelectorAll('button').forEach(b => b.classList.remove('ativo'));
-        botao.classList.add('ativo');
+        mostrarImagem([...thumbs.children].indexOf(botao));
       });
+      // Swipe (deslizar) no mobile para mudar de foto
+      const galeria = document.querySelector('.galeria-principal');
+      let x0 = null, y0 = null;
+      galeria.addEventListener('touchstart', (e) => {
+        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+      }, { passive: true });
+      galeria.addEventListener('touchend', (e) => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0;
+        const dy = e.changedTouches[0].clientY - y0;
+        // só conta como swipe horizontal se for claramente lateral
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+          mostrarImagem(dx < 0 ? Math.min(galeriaIdx + 1, p.imagens.length - 1)
+                                : Math.max(galeriaIdx - 1, 0));
+        }
+        x0 = null; y0 = null;
+      }, { passive: true });
     }
 
     // Quantidade + adicionar
