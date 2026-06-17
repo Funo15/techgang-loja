@@ -67,7 +67,7 @@ var codigo = 'javascript:(function(){try{'+
 'var url=location.href.split("?")[0];'+
 'var m=url.match(/\\/item\\/(\\d+)\\.html/);'+
 'if(!nome&&!imgs.length){alert("Abre um produto no AliExpress primeiro!");return;}'+
-'var payload={nome:nome,cores:cores,variantes:variantes,imagens_urls:imgs,rating:rating,num_avaliacoes:avals,fornecedor_url:url,fornecedor_product_id:m?m[1]:"",custo_aliexpress:custo,preco_original_aliexpress:precoOrigAli,tempo_envio_dias:"8-15"};'+
+'var payload={nome:nome,cores:cores,variantes:variantes,imagens_urls:imgs,rating:rating,num_avaliacoes:avals,fornecedor_url:url,fornecedor_product_id:m?m[1]:"",custo_aliexpress:custo,preco_original_aliexpress:precoOrigAli,tempo_envio_dias:"5-15"};'+
 'window.open("https://techgang.pt/funitocorp/importar#"+btoa(unescape(encodeURIComponent(JSON.stringify(payload)))),"_blank");'+
 '}catch(e){alert("Erro: "+e.message);}})();';
 document.getElementById('btn-copiar').addEventListener('click', function() {

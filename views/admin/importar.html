@@ -59,7 +59,7 @@
         </div>
         <div class="campo">
           <label>Tempo de envio (dias)</label>
-          <input id="imp-envio" name="tempo_envio_dias" type="text" placeholder="8-12">
+          <input id="imp-envio" name="tempo_envio_dias" type="text" placeholder="5-15">
         </div>
       </div>
       <div class="adm-toggles">
@@ -122,7 +122,7 @@
   if (d.num_avaliacoes) document.getElementById('imp-avaliacoes').value = d.num_avaliacoes;
   if (d.fornecedor_url) document.getElementById('imp-url').value = d.fornecedor_url;
   if (d.fornecedor_product_id) document.getElementById('imp-pid').value = d.fornecedor_product_id;
-  document.getElementById('imp-envio').value = d.tempo_envio_dias || '8-15';
+  document.getElementById('imp-envio').value = d.tempo_envio_dias || '5-15';
 
   // Custo AliExpress (vem em cêntimos do bookmarklet → mostrar em euros)
   if (d.custo_aliexpress) {
@@ -200,7 +200,7 @@
       imagens_urls: JSON.parse(document.getElementById('imp-imagens-urls').value || '[]'),
       rating: parseFloat(document.getElementById('imp-rating').value) || 4.8,
       num_avaliacoes: parseInt(document.getElementById('imp-avaliacoes').value) || 0,
-      tempo_envio_dias: document.getElementById('imp-envio').value.trim() || '8-15',
+      tempo_envio_dias: document.getElementById('imp-envio').value.trim() || '5-15',
       fornecedor_url: document.getElementById('imp-url').value.trim(),
       fornecedor_product_id: document.getElementById('imp-pid').value.trim(),
       custo_fornecedor: document.getElementById('imp-custo').value ? Math.round(parseFloat(document.getElementById('imp-custo').value) * 100) : null,
