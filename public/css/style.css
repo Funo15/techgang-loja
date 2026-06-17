@@ -50,6 +50,11 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
   --sombra-cartao-hover: 0 10px 32px rgba(27, 22, 50, 0.12);
   --lilas: color-mix(in srgb, var(--cor-acento) 9%, #ffffff);   /* fundos suaves roxos */
   --lilas-medio: color-mix(in srgb, var(--cor-acento) 16%, #ffffff);
+  --max-conteudo: 1320px;   /* largura máx. do conteúdo */
+}
+/* Ecrãs grandes (iMac 24"+): usar mais o ecrã */
+@media (min-width: 1600px) {
+  :root { --max-conteudo: 1520px; }
 }
 
 /* Preços e números: sans bold (estilo app) */
@@ -98,7 +103,7 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
   border-bottom: 1px solid var(--cor-linha);
 }
 .header-inner {
-  max-width: 1200px;
+  max-width: var(--max-conteudo);
   margin: 0 auto;
   padding: 0 1.25rem;
   height: 64px;
@@ -245,7 +250,7 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
 
 /* ---------- Secções ---------- */
 .seccao {
-  max-width: 1200px;
+  max-width: var(--max-conteudo);
   margin: 0 auto;
   padding: 1.4rem 1.25rem;
 }
@@ -1166,7 +1171,7 @@ body[data-page="produto"] main { padding-bottom: 90px; }
 /* ---------- Footer ---------- */
 .footer { margin-top: 2.5rem; }
 .footer-inner {
-  max-width: 1200px;
+  max-width: var(--max-conteudo);
   margin: 0 auto;
   padding: 2rem 1.25rem;
   display: grid;
@@ -1193,7 +1198,7 @@ body[data-page="produto"] main { padding-bottom: 90px; }
 }
 .footer-links a:hover { color: var(--cor-acento); }
 .footer-base {
-  max-width: 1200px;
+  max-width: var(--max-conteudo);
   margin: 0 auto;
   padding: 1rem 1.25rem 1.3rem;
   border-top: 1px solid var(--cor-linha);
