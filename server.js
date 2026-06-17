@@ -27,6 +27,14 @@ process.on('unhandledRejection', (reason) => {
 require('./db/database');
 
 const app = express();
+app.disable('x-powered-by');
+
+// Não revelar a stack/alojamento nos headers (best-effort — o proxy de
+// borda do Railway pode na mesma adicionar os seus próprios).
+app.use((req, res, next) => {
+  res.setHeader('Server', 'TechGang');
+  next();
+});
 
 // Nonce por pedido (antes do Helmet — a CSP usa res.locals.nonce)
 app.use(gerarNonce);
