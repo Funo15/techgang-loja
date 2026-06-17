@@ -1280,6 +1280,33 @@ body[data-page="produto"] main { padding-bottom: 90px; }
 }
 .footer-base a { color: var(--cor-texto-suave); }
 
+/* Redes sociais */
+.footer-social { display: flex; gap: 0.6rem; margin-top: 1.1rem; }
+.footer-social a {
+  width: 40px; height: 40px; border-radius: 11px;
+  border: 1px solid var(--cor-linha);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cor-texto);
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+.footer-social a:hover {
+  background: var(--cor-acento); color: var(--cor-acento-texto);
+  border-color: var(--cor-acento); transform: translateY(-2px);
+}
+.footer-social svg { width: 20px; height: 20px; }
+/* Coluna de contacto */
+.footer-nota { display: block; font-size: 0.85rem; color: var(--cor-texto-suave); padding: 0.25rem 0; }
+/* Selo de pagamento seguro */
+.footer-pagamentos { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.footer-pag-label { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600; color: var(--cor-texto); }
+.footer-pag-label svg { width: 16px; height: 16px; }
+.pag-chip {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.02em;
+  padding: 0.25rem 0.5rem; border-radius: 6px;
+  background: var(--cor-fundo-elevado); border: 1px solid var(--cor-linha);
+  color: var(--cor-texto-suave);
+}
+
 /* ---------- Animação fade-in ao scroll ---------- */
 .revelar {
   opacity: 0;
@@ -1326,8 +1353,8 @@ body[data-page="produto"] main { padding-bottom: 90px; }
   .produto-info { align-self: start; padding-top: 0.5rem; }
   .compra-bar { display: none; } /* só faz sentido em mobile */
 
-  .footer-inner { grid-template-columns: 1fr 1fr; }
-  .footer-links { justify-self: end; gap: 3.5rem; }
+  .footer-inner { grid-template-columns: 1.2fr 2fr; }
+  .footer-links { justify-self: end; grid-template-columns: repeat(3, auto); gap: 3.5rem; }
 }
 
 @media (min-width: 1024px) {
