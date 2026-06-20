@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /funitocorp
+Disallow: /api/
+Disallow: /conta
+Disallow: /checkout
+Disallow: /carrinho
+
+Sitemap: https://techgang.pt/sitemap.xml
