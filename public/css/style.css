@@ -699,10 +699,11 @@ body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
 }
 
 .produto-info h1 {
-  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  font-family: var(--fonte-corpo);
+  font-size: clamp(1.55rem, 3vw, 2.05rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
   margin-bottom: 0.8rem;
 }
 
