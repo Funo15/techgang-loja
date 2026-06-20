@@ -628,7 +628,7 @@ body[data-page="produto"],
 body[data-page="carrinho"] { background: var(--cor-fundo-elevado); }
 
 .produto-detalhe {
-  max-width: 1280px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 1.2rem 1.25rem 3rem;
   display: grid;
@@ -1349,7 +1349,7 @@ body[data-page="produto"] main { padding-bottom: 90px; }
   .banda-ink { padding: 2.5rem 2.2rem; }
   .banda-ink-grelha { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
 
-  .produto-detalhe { grid-template-columns: 0.92fr 1.08fr; gap: 3rem; padding-top: 1.6rem; }
+  .produto-detalhe { grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 3rem; padding-top: 1.6rem; }
   .produto-info { align-self: start; padding-top: 0.5rem; }
   .compra-bar { display: none; } /* só faz sentido em mobile */
 
