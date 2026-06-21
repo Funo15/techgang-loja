@@ -7,24 +7,53 @@
 {{include:header}}
 
 <main>
-  <!-- Banner promo (cartão roxo, estilo app) -->
+  <!-- Hero carrossel -->
   <section class="seccao seccao-banner">
-    <div class="banner">
-      <div class="banner-texto">
-        <span class="banner-chip">⚡ Novidades toda a semana</span>
-        <h1>Tech nova para o teu setup</h1>
-        <p>Gadgets escolhidos a dedo, com envio e tracking incluídos.</p>
-        <div class="banner-acoes">
-          <a href="/produtos" class="btn btn-claro">Ver produtos</a>
-          <a href="/produtos?tendencia=1" class="btn btn-banner-fantasma">Em tendência 🔥</a>
+    <div class="hero-carousel" id="heroCarousel">
+
+      <!-- Slide 1: Principal -->
+      <div class="banner hero-slide hero-slide--ativo">
+        <div class="banner-texto">
+          <span class="banner-chip">⚡ Novidades toda a semana</span>
+          <h1>Tech nova para o teu setup</h1>
+          <p>Gadgets escolhidos a dedo, com envio e tracking incluídos.</p>
+          <div class="banner-acoes">
+            <a href="/produtos" class="btn btn-claro">Ver produtos</a>
+            <a href="/produtos?tendencia=1" class="btn btn-banner-fantasma">Em tendência 🔥</a>
+          </div>
+          <ul class="banner-confianca">
+            <li>Pagamento seguro</li>
+            <li>Garantia 24 meses</li>
+            <li>14 dias para devolver</li>
+          </ul>
         </div>
-        <ul class="banner-confianca">
-          <li>Pagamento seguro</li>
-          <li>Garantia 24 meses</li>
-          <li>14 dias para devolver</li>
-        </ul>
+        <div class="banner-media" aria-hidden="true"></div>
       </div>
-      <div class="banner-media" aria-hidden="true"></div>
+
+      <!-- Slide 2: Lâmpada Maglev -->
+      <div class="banner hero-slide banner--maglev">
+        <div class="banner-texto">
+          <span class="banner-chip">🔥 Produto da semana</span>
+          <h1>O presente que toda a gente vai querer</h1>
+          <p>Nota de dinheiro que levita e roda no ar. Tecnologia Maglev com LED dourado.</p>
+          <div class="banner-acoes">
+            <a href="/produto/lampada-maglev-flutuante-dinheiro" class="btn btn-claro">Ver agora</a>
+            <a href="/produto/lampada-maglev-flutuante-dinheiro" class="btn btn-banner-fantasma">€90,00</a>
+          </div>
+          <ul class="banner-confianca">
+            <li>Envio com tracking</li>
+            <li>Garantia 24 meses</li>
+            <li>14 dias para devolver</li>
+          </ul>
+        </div>
+        <div class="banner-media" aria-hidden="true"></div>
+      </div>
+
+      <!-- Dots de navegação -->
+      <div class="hero-dots" aria-label="Navegação do carrossel">
+        <button class="hero-dot hero-dot--ativo" data-slide="0" aria-label="Slide 1"></button>
+        <button class="hero-dot" data-slide="1" aria-label="Slide 2"></button>
+      </div>
     </div>
   </section>
 

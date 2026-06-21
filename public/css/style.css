@@ -271,8 +271,68 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
 }
 .link-seta:hover { text-decoration: underline; }
 
-/* ---------- Banner promo (cartão roxo) ---------- */
+/* ---------- Hero Carrossel ---------- */
 .seccao-banner { padding-top: 0.8rem; }
+.hero-carousel { position: relative; }
+.hero-carousel .hero-slide { display: none !important; }
+.hero-carousel .hero-slide--ativo { display: grid !important; }
+.hero-slide.hero-sair { animation: heroDeslizaSair 0.45s ease forwards; }
+.hero-slide.hero-entrar { animation: heroDeslizaEntrar 0.45s ease forwards; }
+@keyframes heroDeslizaEntrar {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes heroDeslizaSair {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-40px); }
+}
+.hero-dots {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+.hero-dot {
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255,255,255,0.35);
+  cursor: pointer;
+  transition: background 0.2s, width 0.2s;
+  padding: 0;
+}
+.hero-dot--ativo { background: #fff; width: 22px; }
+
+/* Slide 2: tema escuro/dourado (lâmpada maglev) */
+.banner--maglev {
+  --hero: url('/media/p-1782057499730-48wimy.webp');
+  background:
+    linear-gradient(100deg, #0f0c04 0%, color-mix(in srgb, #1a1305 78%, transparent) 38%, color-mix(in srgb, #1a1305 30%, transparent) 58%, transparent 78%),
+    var(--hero) center right / cover no-repeat,
+    linear-gradient(135deg, #2a1f00 0%, #1a1000 100%);
+  color: #fff;
+  box-shadow: 0 14px 40px rgba(180,130,0,0.25);
+}
+.banner--maglev .banner-chip {
+  background: rgba(255,200,0,0.15);
+  border-color: rgba(255,200,0,0.3);
+  color: #ffd966;
+}
+.banner--maglev .banner-confianca li::before { color: #ffd966; }
+.banner--maglev .btn-claro {
+  background: #ffd966;
+  color: #1a1000;
+}
+.banner--maglev .btn-claro:hover { background: #ffe280; }
+.banner--maglev .btn-banner-fantasma {
+  border-color: rgba(255,217,102,0.5);
+  color: #ffd966;
+}
+.banner--maglev::before { border-color: rgba(255,200,0,0.08); }
+.banner--maglev::after  { border-color: rgba(255,200,0,0.06); }
 .banner {
   position: relative;
   --hero: url('/media/p-1781718119907-j3fzj3.webp');

@@ -427,6 +427,31 @@
     } catch {
       grelha.innerHTML = '<p class="estado-vazio">Não foi possível carregar os produtos. Atualiza a página.</p>';
     }
+    iniciarHeroCarousel();
+  }
+
+  function iniciarHeroCarousel() {
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.hero-dot');
+    if (slides.length < 2) return;
+    let atual = 0;
+    let timer;
+
+    function irPara(idx) {
+      slides[atual].classList.add('hero-sair');
+      setTimeout(() => {
+        slides[atual].classList.remove('hero-slide--ativo', 'hero-sair');
+        atual = idx;
+        slides[atual].classList.add('hero-slide--ativo', 'hero-entrar');
+        setTimeout(() => slides[atual].classList.remove('hero-entrar'), 450);
+        dots.forEach((d, i) => d.classList.toggle('hero-dot--ativo', i === atual));
+      }, 450);
+    }
+
+    function avancar() { irPara((atual + 1) % slides.length); }
+
+    timer = setInterval(avancar, 6000);
+    dots.forEach((d, i) => d.addEventListener('click', () => { clearInterval(timer); irPara(i); timer = setInterval(avancar, 6000); }));
   }
 
   // --- Listagem com filtros (+ coleções da nav: tendências/novidades) ---
