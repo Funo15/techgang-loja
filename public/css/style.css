@@ -290,6 +290,15 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
   justify-content: center;
   white-space: nowrap;
 }
+.banner-ai-cta .btn-banner-fantasma {
+  border-color: var(--cor-acento);
+  color: var(--cor-acento);
+  background: rgba(255,255,255,0.85);
+}
+.banner-ai-cta .btn-banner-fantasma:hover {
+  background: var(--cor-acento);
+  color: #fff;
+}
 @media (max-width: 600px) {
   .banner-ai-img { max-height: 220px; object-position: center; border-radius: 12px; }
   .banner-ai-cta { bottom: 0.8rem; gap: 0.5rem; }
