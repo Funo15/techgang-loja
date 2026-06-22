@@ -422,11 +422,58 @@
     try {
       const res = await fetch('/api/produtos/destaques');
       const produtos = await res.json();
-      grelha.innerHTML = produtos.slice(0, 4).map(cardProduto).join('');
+      grelha.innerHTML = produtos.slice(0, 8).map(cardProduto).join('');
       observarReveals(grelha);
     } catch {
       grelha.innerHTML = '<p class="estado-vazio">Não foi possível carregar os produtos. Atualiza a página.</p>';
     }
+
+    // Produto em destaque (spotlight) + secção "Em tendência"
+    try {
+      const todos = await (await fetch('/api/produtos')).json();
+
+      // --- Spotlight: produto a destacar (por slug; fallback = mais avaliado em promo) ---
+      const SLUG_DESTAQUE = 'candeeiro-de-por-do-sol-led-projetor-de-luz-ambiente-usb';
+      let destaque = todos.find(p => p.slug === SLUG_DESTAQUE);
+      if (!destaque) {
+        const ordenados = [...todos].sort((a, b) => (b.num_avaliacoes || 0) - (a.num_avaliacoes || 0));
+        destaque = ordenados.find(p => p.preco_promo) || ordenados[0];
+      }
+      const spot = document.getElementById('seccao-spotlight');
+      if (destaque && spot) {
+        const desc = percentDesconto(destaque);
+        document.getElementById('spotlight-link').href = `/produto/${destaque.slug}`;
+        document.getElementById('spotlight-img').src = destaque.imagens[0] || '';
+        document.getElementById('spotlight-img').alt = destaque.nome;
+        document.getElementById('spotlight-nome').textContent = destaque.nome;
+        document.getElementById('spotlight-desc').textContent = (destaque.descricao || '').slice(0, 160) + ((destaque.descricao || '').length > 160 ? '…' : '');
+        document.getElementById('spotlight-preco').textContent = formatarPreco(precoEfetivo(destaque));
+        if (desc) {
+          const badge = document.getElementById('spotlight-badge');
+          badge.textContent = `-${desc}%`; badge.hidden = false;
+          const antigo = document.getElementById('spotlight-preco-antigo');
+          antigo.textContent = formatarPreco(destaque.preco); antigo.hidden = false;
+        }
+        if (destaque.em_tendencia) document.getElementById('spotlight-tag').hidden = false;
+        if (destaque.rating) {
+          const estrelas = '★'.repeat(Math.round(destaque.rating)) + '☆'.repeat(5 - Math.round(destaque.rating));
+          document.getElementById('spotlight-rating').innerHTML =
+            `<span class="spotlight-estrelas">${estrelas}</span> <span>${String(destaque.rating).replace('.', ',')}</span> <span class="spotlight-aval">(${(destaque.num_avaliacoes || 0).toLocaleString('pt-PT')} avaliações)</span>`;
+        }
+        spot.hidden = false;
+      }
+
+      // --- Em tendência: só aparece se houver produtos marcados ---
+      const tendencia = todos.filter(p => p.em_tendencia).slice(0, 4);
+      const seccao = document.getElementById('seccao-tendencia');
+      const grelhaT = document.getElementById('grelha-tendencia');
+      if (tendencia.length && seccao && grelhaT) {
+        grelhaT.innerHTML = tendencia.map(cardProduto).join('');
+        seccao.hidden = false;
+        observarReveals(grelhaT);
+      }
+    } catch { /* secção opcional; ignora falha */ }
+
     iniciarHeroCarousel();
   }
 

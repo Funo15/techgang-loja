@@ -62,6 +62,30 @@
     </div>
   </section>
 
+  <!-- Produto em destaque (spotlight) -->
+  <section class="seccao" id="seccao-spotlight" hidden>
+    <div class="seccao-cabeca">
+      <h2>Produto em destaque ⭐</h2>
+    </div>
+    <a class="spotlight" id="spotlight-link" href="#">
+      <div class="spotlight-media">
+        <span class="badge-promo" id="spotlight-badge" hidden></span>
+        <img id="spotlight-img" src="" alt="" width="900" height="900">
+      </div>
+      <div class="spotlight-info">
+        <span class="spotlight-tag" id="spotlight-tag" hidden>🔥 Em tendência</span>
+        <h3 id="spotlight-nome"></h3>
+        <div class="spotlight-rating" id="spotlight-rating"></div>
+        <p class="spotlight-desc" id="spotlight-desc"></p>
+        <div class="card-preco spotlight-preco">
+          <span class="preco-display preco-atual" id="spotlight-preco"></span>
+          <span class="preco-antigo" id="spotlight-preco-antigo" hidden></span>
+        </div>
+        <span class="btn btn-primario spotlight-btn">Comprar agora</span>
+      </div>
+    </a>
+  </section>
+
   <!-- Produtos em destaque -->
   <section class="seccao">
     <div class="seccao-cabeca">
@@ -70,6 +94,18 @@
     </div>
     <div class="grelha-destaques" id="grelha-destaques">
       <!-- preenchido por JS; skeleton enquanto carrega -->
+      <div class="skeleton-card"></div><div class="skeleton-card"></div>
+      <div class="skeleton-card"></div><div class="skeleton-card"></div>
+    </div>
+  </section>
+
+  <!-- Em tendência -->
+  <section class="seccao" id="seccao-tendencia" hidden>
+    <div class="seccao-cabeca">
+      <h2>Em tendência 🔥</h2>
+      <a href="/produtos?colecao=tendencias" class="link-seta">Ver tudo</a>
+    </div>
+    <div class="grelha-destaques" id="grelha-tendencia">
       <div class="skeleton-card"></div><div class="skeleton-card"></div>
       <div class="skeleton-card"></div><div class="skeleton-card"></div>
     </div>
