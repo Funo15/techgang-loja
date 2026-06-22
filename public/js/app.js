@@ -422,7 +422,7 @@
     try {
       const res = await fetch('/api/produtos/destaques');
       const produtos = await res.json();
-      grelha.innerHTML = produtos.slice(0, 8).map(cardProduto).join('');
+      grelha.innerHTML = produtos.slice(0, 4).map(cardProduto).join('');
       observarReveals(grelha);
     } catch {
       grelha.innerHTML = '<p class="estado-vazio">Não foi possível carregar os produtos. Atualiza a página.</p>';
