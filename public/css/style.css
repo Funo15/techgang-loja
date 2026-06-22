@@ -276,6 +276,19 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 800; line-height: 1.
 .hero-carousel { position: relative; }
 .hero-carousel .hero-slide { display: none !important; }
 .hero-carousel .hero-slide--ativo { display: grid !important; }
+.banner-ai { position: relative; overflow: hidden; border-radius: 16px; }
+.banner-ai-img { width: 100%; display: block; border-radius: 16px; object-fit: cover; max-height: 480px; }
+.banner-ai-cta {
+  position: absolute;
+  bottom: 1.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.8rem;
+  z-index: 2;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 .hero-slide.hero-sair { animation: heroDeslizaSair 0.45s ease forwards; }
 .hero-slide.hero-entrar { animation: heroDeslizaEntrar 0.45s ease forwards; }
 @keyframes heroDeslizaEntrar {
